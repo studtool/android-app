@@ -1,0 +1,15 @@
+### IDE ###
+.idea
+*.iml
+
+### Gradle ###
+.gradle
+/build
+
+### dev ###
+/local.properties
+
+#.DS_Store
+
+#/captures
+#.externalNativeBuild
