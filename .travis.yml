@@ -2,3 +2,11 @@ language: android
 android:
   components:
     - android-28
+
+jobs:
+  include:
+    - stage: build
+      script:
+        - ./gradlew build
+      after_script:
+        - ./gradlew clean
