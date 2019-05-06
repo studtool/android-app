@@ -2,23 +2,24 @@ package ru.mail.park.studtool.activity
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
-import android.annotation.TargetApi
 import android.content.Intent
 import android.os.AsyncTask
-import android.os.Build
 import android.os.Bundle
 import android.text.TextUtils
 import android.view.View
 import android.view.inputmethod.EditorInfo
 import android.widget.TextView
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import ru.mail.park.studtool.MainActivity
 import ru.mail.park.studtool.R
 import ru.mail.park.studtool.api.AuthApiManager
 import ru.mail.park.studtool.api.Credentials
+import ru.mail.park.studtool.exception.ConflictApiException
+import ru.mail.park.studtool.exception.InternalApiException
 
 class SignUpActivity : BaseActivity() {
-    private var mAuthTask: UserLoginTask? = null
+    private var mAuthTask: UserSignUpTask? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,10 +80,11 @@ class SignUpActivity : BaseActivity() {
             focusView?.requestFocus()
         } else {
             showProgress(true)
-            mAuthTask = UserLoginTask(emailStr, passwordStr)
-            mAuthTask!!.execute(null as Void?)
-            val intent = Intent(this, MainActivity::class.java)
-            startActivity(intent)
+            mAuthTask = UserSignUpTask(emailStr, passwordStr)
+            if (mAuthTask!!.execute(null as Void?).get()) {
+                val intent = Intent(this, MainActivity::class.java)
+                startActivity(intent)
+            }
         }
     }
 
@@ -94,7 +96,6 @@ class SignUpActivity : BaseActivity() {
         return password.length >= 8
     }
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB_MR2)
     private fun showProgress(show: Boolean) {
         val shortAnimTime = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
 
@@ -119,39 +120,35 @@ class SignUpActivity : BaseActivity() {
             })
     }
 
-    inner class UserLoginTask internal constructor(private val mEmail: String, private val mPassword: String) :
-        AsyncTask<Void, Void, Boolean>() {
+    private inner class UserSignUpTask(private val mEmail: String,
+                                       private val mPassword: String) : AsyncTask<Void, Void, Boolean>() {
 
-        override fun doInBackground(vararg params: Void): Boolean? {
-            try {
+        override fun doInBackground(vararg params: Void): Boolean {
+            return try {
                 AuthApiManager()
-                    .performSignUp(Credentials(
-                        email = mEmail, password = mPassword
-                    ))
-                Thread.sleep(1000)
+                    .performSignUp(
+                        Credentials(
+                            email = mEmail, password = mPassword
+                        )
+                    )
+                true
+            } catch (e: ConflictApiException) {
+                Toast.makeText(applicationContext, "Email duplicate!", Toast.LENGTH_LONG).show() //TODO
+                false
+            } catch (e: InternalApiException) {
+                Toast.makeText(applicationContext, "Server error!", Toast.LENGTH_LONG).show() //TODO
+                false
             } catch (e: InterruptedException) {
-                return false
+                false
             }
-
-            return DUMMY_CREDENTIALS
-                .map { it.split(":") }
-                .firstOrNull { it[0] == mEmail }
-                ?.let {
-                    // Account exists, return true if the password matches.
-                    it[1] == mPassword
-                }
-                ?: true
         }
 
-        override fun onPostExecute(success: Boolean?) {
+        override fun onPostExecute(success: Boolean) {
             mAuthTask = null
             showProgress(true)
 
-            if (success!!) {
+            if (success) {
                 finish()
-            } else {
-                tv_SignUpPassword.error = getString(R.string.error_incorrect_password)
-                tv_SignUpPassword.requestFocus()
             }
         }
 
@@ -159,9 +156,5 @@ class SignUpActivity : BaseActivity() {
             mAuthTask = null
             showProgress(false)
         }
-    }
-
-    companion object {
-        private val DUMMY_CREDENTIALS = arrayOf("foo@example.com:hello", "bar@example.com:world")
     }
 }
