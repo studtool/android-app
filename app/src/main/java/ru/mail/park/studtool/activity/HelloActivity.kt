@@ -3,8 +3,8 @@ package ru.mail.park.studtool.activity
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
-import ru.mail.park.studtool.SignInActivity
 import ru.mail.park.studtool.R
+import ru.mail.park.studtool.SignInActivity
 
 class HelloActivity : BaseActivity() {
 
@@ -16,13 +16,13 @@ class HelloActivity : BaseActivity() {
         setContentView(R.layout.activity_hello)
 
         mBtnSignIn = findViewById(R.id.btn_signIn)
-        mBtnSignIn.setOnClickListener{
+        mBtnSignIn.setOnClickListener {
             val intent = Intent(this, SignInActivity::class.java)
             startActivity(intent)
         }
 
         mBtnSignUp = findViewById(R.id.btn_signUp)
-        mBtnSignUp.setOnClickListener{
+        mBtnSignUp.setOnClickListener {
             val intent = Intent(this, SignUpActivity::class.java)
             startActivity(intent)
         }

@@ -1,7 +1,7 @@
 package ru.mail.park.studtool.activity
 
-import android.os.Bundle
 import android.content.Intent
+import android.os.Bundle
 
 class SplashActivity : BaseActivity() {
 

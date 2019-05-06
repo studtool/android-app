@@ -2,21 +2,19 @@ package ru.mail.park.studtool
 
 import android.content.Intent
 import android.os.Bundle
+import android.support.design.widget.Snackbar
+import android.support.v4.app.NavUtils
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
-import android.support.design.widget.Snackbar
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
-import android.support.v4.app.NavUtils
-import android.support.v7.app.ActionBar
-import android.view.MenuItem
-
-import ru.mail.park.studtool.dummy.DummyContent
 import kotlinx.android.synthetic.main.activity_item_list.*
-import kotlinx.android.synthetic.main.item_list_content.view.*
 import kotlinx.android.synthetic.main.item_list.*
+import kotlinx.android.synthetic.main.item_list_content.view.*
+import ru.mail.park.studtool.dummy.DummyContent
 
 /**
  * An activity representing a list of Pings. This activity
