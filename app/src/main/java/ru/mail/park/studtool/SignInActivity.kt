@@ -25,12 +25,12 @@ import java.util.ArrayList
 import android.Manifest.permission.READ_CONTACTS
 import android.content.Intent
 
-import kotlinx.android.synthetic.main.activity_sign_up.*
+import kotlinx.android.synthetic.main.activity_login.*
 
 /**
  * A login screen that offers login via email/password.
  */
-class SignUpActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
+class SignInActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
@@ -38,10 +38,11 @@ class SignUpActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_sign_up)
+        setContentView(R.layout.activity_login)
+        setupActionBar()
         // Set up the login form.
         populateAutoComplete()
-        password.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
+        tv_SignUpPassword.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
             if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
                 attemptLogin()
                 return@OnEditorActionListener true
@@ -49,7 +50,7 @@ class SignUpActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             false
         })
 
-        email_sign_in_button.setOnClickListener { attemptLogin() }
+        btn_performSignUp.setOnClickListener { attemptLogin() }
     }
 
     private fun populateAutoComplete() {
@@ -68,7 +69,7 @@ class SignUpActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             return true
         }
         if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(email, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
+            Snackbar.make(tv_SignUpEmail, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
                 .setAction(android.R.string.ok,
                     { requestPermissions(arrayOf(READ_CONTACTS), REQUEST_READ_CONTACTS) })
         } else {
@@ -91,6 +92,16 @@ class SignUpActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         }
     }
 
+    /**
+     * Set up the {@link android.app.ActionBar}, if the API is available.
+     */
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    private fun setupActionBar() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+            // Show the Up button in the action bar.
+            supportActionBar?.setDisplayHomeAsUpEnabled(true)
+        }
+    }
 
     /**
      * Attempts to sign in or register the account specified by the login form.
@@ -103,38 +114,31 @@ class SignUpActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         }
 
         // Reset errors.
-        email.error = null
-        password.error = null
+        tv_SignUpEmail.error = null
+        tv_SignUpPassword.error = null
 
         // Store values at the time of the login attempt.
-        val emailStr = email.text.toString()
-        val passwordStr = password.text.toString()
-        val passwordRepeatStr = passwordRepeat.text.toString()
+        val emailStr = tv_SignUpEmail.text.toString()
+        val passwordStr = tv_SignUpPassword.text.toString()
 
         var cancel = false
         var focusView: View? = null
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(passwordStr) && !isPasswordValid(passwordStr) && !TextUtils.isEmpty(passwordRepeatStr) && !isPasswordValid(passwordRepeatStr)) {
-            password.error = getString(R.string.error_invalid_password)
-            focusView = password
-            cancel = true
-        }
-
-        if (passwordStr != passwordRepeatStr){
-            password.error = "Пароли не совпадают"
-            focusView = password
+        if (!TextUtils.isEmpty(passwordStr) && !isPasswordValid(passwordStr)) {
+            tv_SignUpPassword.error = getString(R.string.error_invalid_password)
+            focusView = tv_SignUpPassword
             cancel = true
         }
 
         // Check for a valid email address.
         if (TextUtils.isEmpty(emailStr)) {
-            email.error = getString(R.string.error_field_required)
-            focusView = email
+            tv_SignUpEmail.error = getString(R.string.error_field_required)
+            focusView = tv_SignUpEmail
             cancel = true
         } else if (!isEmailValid(emailStr)) {
-            email.error = getString(R.string.error_invalid_email)
-            focusView = email
+            tv_SignUpEmail.error = getString(R.string.error_invalid_email)
+            focusView = tv_SignUpEmail
             cancel = true
         }
 
@@ -240,11 +244,11 @@ class SignUpActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
     private fun addEmailsToAutoComplete(emailAddressCollection: List<String>) {
         //Create adapter to tell the AutoCompleteTextView what to show in its dropdown list.
         val adapter = ArrayAdapter(
-            this@SignUpActivity,
+            this@SignInActivity,
             android.R.layout.simple_dropdown_item_1line, emailAddressCollection
         )
 
-        email.setAdapter(adapter)
+        tv_SignUpEmail.setAdapter(adapter)
     }
 
     object ProfileQuery {
@@ -285,13 +289,13 @@ class SignUpActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
         override fun onPostExecute(success: Boolean?) {
             mAuthTask = null
-            showProgress(true)
+            showProgress(false)
 
             if (success!!) {
                 finish()
             } else {
-                password.error = getString(R.string.error_incorrect_password)
-                password.requestFocus()
+                tv_SignUpPassword.error = getString(R.string.error_incorrect_password)
+                tv_SignUpPassword.requestFocus()
             }
         }
 

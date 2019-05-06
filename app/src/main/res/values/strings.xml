@@ -25,4 +25,5 @@
     <string name="title_item_detail">Item Detail</string>
     <string name="welcome_studtool">Добро пожаловать в Studtool</string>
     <string name="hello_studtool">Мы поможем сделать вашу учебу проще</string>
+    <string name="error_passwords_mismatch">Пароли не совпадают</string>
 </resources>
