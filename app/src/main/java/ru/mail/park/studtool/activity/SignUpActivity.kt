@@ -14,6 +14,8 @@ import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import ru.mail.park.studtool.MainActivity
 import ru.mail.park.studtool.R
+import ru.mail.park.studtool.api.AuthApiManager
+import ru.mail.park.studtool.api.Credentials
 
 class SignUpActivity : BaseActivity() {
     private var mAuthTask: UserLoginTask? = null
@@ -122,7 +124,11 @@ class SignUpActivity : BaseActivity() {
 
         override fun doInBackground(vararg params: Void): Boolean? {
             try {
-                Thread.sleep(2000) //TODO
+                AuthApiManager()
+                    .performSignUp(Credentials(
+                        email = mEmail, password = mPassword
+                    ))
+                Thread.sleep(1000)
             } catch (e: InterruptedException) {
                 return false
             }
