@@ -13,7 +13,7 @@
 
     <!-- Login progress -->
     <ProgressBar
-            android:id="@+id/login_progress"
+            android:id="@+id/pb_SignUpProgress"
             style="?android:attr/progressBarStyleLarge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -21,12 +21,12 @@
             android:visibility="gone"/>
 
     <ScrollView
-            android:id="@+id/login_form"
+            android:id="@+id/scv_SignUpForm"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
         <LinearLayout
-                android:id="@+id/email_login_form"
+                android:id="@+id/l_SignUpForm"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical">
@@ -36,7 +36,7 @@
                     android:layout_height="wrap_content">
 
                 <AutoCompleteTextView
-                        android:id="@+id/tv_SignUpEmail"
+                        android:id="@+id/et_SignUpEmail"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/prompt_email"
@@ -51,7 +51,7 @@
                     android:layout_height="wrap_content">
 
                 <EditText
-                        android:id="@+id/tv_SignUpPassword"
+                        android:id="@+id/et_SignUpPassword"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:hint="@string/prompt_password"
@@ -65,7 +65,7 @@
             </android.support.design.widget.TextInputLayout>
 
             <Button
-                    android:id="@+id/btn_performSignUp"
+                    android:id="@+id/btn_AttemptSignUp"
                     style="?android:textAppearanceSmall"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

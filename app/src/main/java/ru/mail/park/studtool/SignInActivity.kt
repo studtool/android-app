@@ -40,7 +40,7 @@ class SignInActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         setupActionBar()
         // Set up the login form.
         populateAutoComplete()
-        tv_SignUpPassword.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
+        et_SignUpPassword.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
             if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
                 attemptLogin()
                 return@OnEditorActionListener true
@@ -48,7 +48,7 @@ class SignInActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             false
         })
 
-        btn_performSignUp.setOnClickListener { attemptLogin() }
+        btn_AttemptSignUp.setOnClickListener { attemptLogin() }
     }
 
     private fun populateAutoComplete() {
@@ -67,7 +67,7 @@ class SignInActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             return true
         }
         if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(tv_SignUpEmail, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
+            Snackbar.make(et_SignUpEmail, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
                 .setAction(android.R.string.ok,
                     { requestPermissions(arrayOf(READ_CONTACTS), REQUEST_READ_CONTACTS) })
         } else {
@@ -112,31 +112,31 @@ class SignInActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         }
 
         // Reset errors.
-        tv_SignUpEmail.error = null
-        tv_SignUpPassword.error = null
+        et_SignUpEmail.error = null
+        et_SignUpPassword.error = null
 
         // Store values at the time of the login attempt.
-        val emailStr = tv_SignUpEmail.text.toString()
-        val passwordStr = tv_SignUpPassword.text.toString()
+        val emailStr = et_SignUpEmail.text.toString()
+        val passwordStr = et_SignUpPassword.text.toString()
 
         var cancel = false
         var focusView: View? = null
 
         // Check for a valid password, if the user entered one.
         if (!TextUtils.isEmpty(passwordStr) && !isPasswordValid(passwordStr)) {
-            tv_SignUpPassword.error = getString(R.string.error_invalid_password)
-            focusView = tv_SignUpPassword
+            et_SignUpPassword.error = getString(R.string.error_invalid_password)
+            focusView = et_SignUpPassword
             cancel = true
         }
 
         // Check for a valid email address.
         if (TextUtils.isEmpty(emailStr)) {
-            tv_SignUpEmail.error = getString(R.string.error_field_required)
-            focusView = tv_SignUpEmail
+            et_SignUpEmail.error = getString(R.string.error_field_required)
+            focusView = et_SignUpEmail
             cancel = true
         } else if (!isEmailValid(emailStr)) {
-            tv_SignUpEmail.error = getString(R.string.error_invalid_email)
-            focusView = tv_SignUpEmail
+            et_SignUpEmail.error = getString(R.string.error_invalid_email)
+            focusView = et_SignUpEmail
             cancel = true
         }
 
@@ -176,30 +176,30 @@ class SignInActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR2) {
             val shortAnimTime = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
 
-            login_form.visibility = if (show) View.GONE else View.VISIBLE
-            login_form.animate()
+            scv_SignUpForm.visibility = if (show) View.GONE else View.VISIBLE
+            scv_SignUpForm.animate()
                 .setDuration(shortAnimTime)
                 .alpha((if (show) 0 else 1).toFloat())
                 .setListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator) {
-                        login_form.visibility = if (show) View.GONE else View.VISIBLE
+                        scv_SignUpForm.visibility = if (show) View.GONE else View.VISIBLE
                     }
                 })
 
-            login_progress.visibility = if (show) View.VISIBLE else View.GONE
-            login_progress.animate()
+            pb_SignUpProgress.visibility = if (show) View.VISIBLE else View.GONE
+            pb_SignUpProgress.animate()
                 .setDuration(shortAnimTime)
                 .alpha((if (show) 1 else 0).toFloat())
                 .setListener(object : AnimatorListenerAdapter() {
                     override fun onAnimationEnd(animation: Animator) {
-                        login_progress.visibility = if (show) View.VISIBLE else View.GONE
+                        pb_SignUpProgress.visibility = if (show) View.VISIBLE else View.GONE
                     }
                 })
         } else {
             // The ViewPropertyAnimator APIs are not available, so simply show
             // and hide the relevant UI components.
-            login_progress.visibility = if (show) View.VISIBLE else View.GONE
-            login_form.visibility = if (show) View.GONE else View.VISIBLE
+            pb_SignUpProgress.visibility = if (show) View.VISIBLE else View.GONE
+            scv_SignUpForm.visibility = if (show) View.GONE else View.VISIBLE
         }
     }
 
@@ -246,7 +246,7 @@ class SignInActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             android.R.layout.simple_dropdown_item_1line, emailAddressCollection
         )
 
-        tv_SignUpEmail.setAdapter(adapter)
+        et_SignUpEmail.setAdapter(adapter)
     }
 
     object ProfileQuery {
@@ -292,8 +292,8 @@ class SignInActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             if (success!!) {
                 finish()
             } else {
-                tv_SignUpPassword.error = getString(R.string.error_incorrect_password)
-                tv_SignUpPassword.requestFocus()
+                et_SignUpPassword.error = getString(R.string.error_incorrect_password)
+                et_SignUpPassword.requestFocus()
             }
         }
 

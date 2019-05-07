@@ -5,35 +5,44 @@ import android.animation.AnimatorListenerAdapter
 import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.View
-import android.view.inputmethod.EditorInfo
-import android.widget.TextView
-import android.widget.Toast
-import kotlinx.android.synthetic.main.activity_sign_up.*
+import android.widget.*
 import ru.mail.park.studtool.MainActivity
 import ru.mail.park.studtool.R
 import ru.mail.park.studtool.api.AuthApiManager
 import ru.mail.park.studtool.api.Credentials
 import ru.mail.park.studtool.exception.ConflictApiException
 import ru.mail.park.studtool.exception.InternalApiException
+import ru.mail.park.studtool.validator.CredentialsValidator
 
 class SignUpActivity : BaseActivity() {
     private var mAuthTask: UserSignUpTask? = null
+
+    private lateinit var mScvSignUpForm: ScrollView
+    private lateinit var mPbSignUpProgress: ProgressBar
+
+    private lateinit var mEtSignUpEmail: EditText
+    private lateinit var mEtSignUpPassword: EditText
+    private lateinit var mEtSignUpPasswordRepeat: EditText
+
+    private lateinit var mBtnPerformSignUp: Button
+    private lateinit var mCredentialsValidator: CredentialsValidator
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
 
-        tv_SignUpPassword.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
-            if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                attemptSignUp()
-                return@OnEditorActionListener true
-            }
-            false
-        })
+        mScvSignUpForm = findViewById(R.id.scv_SignUpForm)
+        mPbSignUpProgress = findViewById(R.id.pb_SignUpProgress)
 
-        btn_performSignUp.setOnClickListener { attemptSignUp() }
+        mEtSignUpEmail = findViewById(R.id.et_SignUpEmail)
+        mEtSignUpPassword = findViewById(R.id.et_SignUpPassword)
+        mEtSignUpPasswordRepeat = findViewById(R.id.et_SignUpPasswordRepeat)
+
+        mBtnPerformSignUp = findViewById(R.id.btn_AttemptSignUp)
+        mBtnPerformSignUp.setOnClickListener { attemptSignUp() }
+
+        mCredentialsValidator = CredentialsValidator()
     }
 
     private fun attemptSignUp() {
@@ -41,102 +50,85 @@ class SignUpActivity : BaseActivity() {
             return
         }
 
-        tv_SignUpEmail.error = null
-        tv_SignUpPassword.error = null
+        mEtSignUpEmail.error = null
+        mEtSignUpPassword.error = null
 
-        val emailStr = tv_SignUpEmail.text.toString()
-        val passwordStr = tv_SignUpPassword.text.toString()
-        val passwordRepeatStr = et_passwordRepeat.text.toString()
+        val emailStr = mEtSignUpEmail.text.toString()
+        val passwordStr = mEtSignUpPassword.text.toString()
+        val passwordRepeatStr = mEtSignUpPasswordRepeat.text.toString()
 
         var cancel = false
         var focusView: View? = null
 
-        if (!TextUtils.isEmpty(passwordStr) && !isPasswordValid(passwordStr) && !TextUtils.isEmpty(passwordRepeatStr) && !isPasswordValid(
-                passwordRepeatStr
-            )
-        ) {
-            tv_SignUpPassword.error = getString(R.string.error_invalid_password)
-            focusView = tv_SignUpPassword
+        var validationResult = mCredentialsValidator.ValidateEmail(emailStr)
+        if (!validationResult.first) {
+            mEtSignUpEmail.error = validationResult.second
+            focusView = mEtSignUpEmail
+            cancel = true
+        }
+        validationResult = mCredentialsValidator.ValidatePassword(passwordStr)
+        if (!validationResult.first) {
+            mEtSignUpPassword.error = validationResult.second
+            focusView = mEtSignUpPassword
             cancel = true
         }
 
-        if (passwordStr != passwordRepeatStr) {
-            tv_SignUpPassword.error = getString(R.string.error_passwords_mismatch)
-            focusView = tv_SignUpPassword
-            cancel = true
-        }
-
-        if (TextUtils.isEmpty(emailStr)) {
-            tv_SignUpEmail.error = getString(R.string.error_field_required)
-            focusView = tv_SignUpEmail
-            cancel = true
-        } else if (!isEmailValid(emailStr)) {
-            tv_SignUpEmail.error = getString(R.string.error_invalid_email)
-            focusView = tv_SignUpEmail
+        if (passwordRepeatStr != passwordStr) {
+            mEtSignUpPasswordRepeat.error = "Passwords mismatch!"
+            focusView = mEtSignUpPasswordRepeat
             cancel = true
         }
 
         if (cancel) {
-            focusView?.requestFocus()
+            focusView!!.requestFocus()
         } else {
             showProgress(true)
-            mAuthTask = UserSignUpTask(emailStr, passwordStr)
-            if (mAuthTask!!.execute(null as Void?).get()) {
-                val intent = Intent(this, MainActivity::class.java)
-                startActivity(intent)
-            }
+            mAuthTask = UserSignUpTask(Credentials(emailStr, passwordStr))
+            mAuthTask!!.execute(null as Void?)
         }
     }
 
-    private fun isEmailValid(email: String): Boolean {
-        return email.contains("@")
-    }
-
-    private fun isPasswordValid(password: String): Boolean {
-        return password.length >= 8
+    private fun showErrorMessage(message: String) {
+        runOnUiThread {
+            Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
+        }
     }
 
     private fun showProgress(show: Boolean) {
         val shortAnimTime = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
 
-        login_form.visibility = if (show) View.GONE else View.VISIBLE
-        login_form.animate()
+        mScvSignUpForm.visibility = if (show) View.GONE else View.VISIBLE
+        mScvSignUpForm.animate()
             .setDuration(shortAnimTime)
             .alpha((if (show) 0 else 1).toFloat())
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    login_form.visibility = if (show) View.GONE else View.VISIBLE
+                    mScvSignUpForm.visibility = if (show) View.GONE else View.VISIBLE
                 }
             })
 
-        login_progress.visibility = if (show) View.VISIBLE else View.GONE
-        login_progress.animate()
+        mScvSignUpForm.visibility = if (show) View.VISIBLE else View.GONE
+        mScvSignUpForm.animate()
             .setDuration(shortAnimTime)
             .alpha((if (show) 1 else 0).toFloat())
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    login_progress.visibility = if (show) View.VISIBLE else View.GONE
+                    mScvSignUpForm.visibility = if (show) View.VISIBLE else View.GONE
                 }
             })
     }
 
-    private inner class UserSignUpTask(private val mEmail: String,
-                                       private val mPassword: String) : AsyncTask<Void, Void, Boolean>() {
+    private inner class UserSignUpTask(private val credentials: Credentials) : AsyncTask<Void, Void, Boolean>() {
 
         override fun doInBackground(vararg params: Void): Boolean {
             return try {
-                AuthApiManager()
-                    .performSignUp(
-                        Credentials(
-                            email = mEmail, password = mPassword
-                        )
-                    )
+                AuthApiManager().performSignUp(credentials)
                 true
             } catch (e: ConflictApiException) {
-                Toast.makeText(applicationContext, "Email duplicate!", Toast.LENGTH_LONG).show() //TODO
+                showErrorMessage("Email duplicate!") //TODO
                 false
             } catch (e: InternalApiException) {
-                Toast.makeText(applicationContext, "Server error!", Toast.LENGTH_LONG).show() //TODO
+                showErrorMessage("Server error!") //TODO
                 false
             } catch (e: InterruptedException) {
                 false
@@ -145,9 +137,11 @@ class SignUpActivity : BaseActivity() {
 
         override fun onPostExecute(success: Boolean) {
             mAuthTask = null
-            showProgress(true)
+            showProgress(false)
 
             if (success) {
+                val intent = Intent(this@SignUpActivity, MainActivity::class.java)
+                startActivity(intent)
                 finish()
             }
         }
