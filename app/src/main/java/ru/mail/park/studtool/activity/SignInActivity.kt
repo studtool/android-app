@@ -117,7 +117,11 @@ class SignInActivity : BaseActivity() {
             return try {
                 AuthApiManager().performSignIn(mCredentials)
             } catch (e: InterruptedException) { //TODO handle exceptions
-                return null
+                null
+            } catch (e: Exception) {
+                null
+            } catch (e: java.lang.Exception) {
+                null
             }
         }
 

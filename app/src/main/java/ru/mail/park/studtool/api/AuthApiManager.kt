@@ -3,9 +3,9 @@ package ru.mail.park.studtool.api
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
-import ru.mail.park.studtool.exception.ApiException
 import ru.mail.park.studtool.exception.ConflictApiException
 import ru.mail.park.studtool.exception.InternalApiException
+import java.util.*
 
 data class Credentials(
     val email: String,
@@ -16,7 +16,7 @@ data class AuthInfo(
     var userId: String = "",
     var authToken: String = "",
     var refreshToken: String = "",
-    var expireTime: String = "" //TODO
+    var expireTime: Date = Date()
 )
 
 class AuthApiManager : ApiManager() {
@@ -24,7 +24,7 @@ class AuthApiManager : ApiManager() {
         val client = OkHttpClient()
 
         val body = RequestBody
-            .create(JSON, toJSON(credentials))
+            .create(mType, toJSON(credentials))
         val request = Request.Builder()
             .url("$REQUEST_PREFIX/v0/auth/profiles")
             .post(body)
@@ -44,16 +44,22 @@ class AuthApiManager : ApiManager() {
         val client = OkHttpClient()
 
         val body = RequestBody
-            .create(JSON, toJSON(credentials))
+            .create(mType, toJSON(credentials))
         val request = Request.Builder()
             .url("$REQUEST_PREFIX/v0/auth/sessions")
             .post(body)
             .build()
         client.newCall(request).execute().use {
             if (it.isSuccessful) {
-                return fromJSON(it.body().toString(), AuthInfo::class.java) as AuthInfo
+                val json = it.body()?.string()
+                if (json != null) {
+                    val info = fromJSON(json, AuthInfo::class.java)
+                    return info as AuthInfo
+                } else {
+                    throw InternalApiException("") //TODO handle
+                }
             } else {
-                throw ApiException(it.message())
+                throw InternalApiException(it.message()) //TODO handle
             }
         }
     }
