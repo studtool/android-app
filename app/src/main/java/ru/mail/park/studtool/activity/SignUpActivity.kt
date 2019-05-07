@@ -7,6 +7,7 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.view.View
 import android.widget.*
+import kotlinx.android.synthetic.main.activity_login.*
 
 import ru.mail.park.studtool.MainActivity
 import ru.mail.park.studtool.R
@@ -108,13 +109,13 @@ class SignUpActivity : BaseActivity() {
                 }
             })
 
-        mScvSignUpForm.visibility = if (show) View.VISIBLE else View.GONE
-        mScvSignUpForm.animate()
+        mPbSignUpProgress.visibility = if (show) View.VISIBLE else View.GONE
+        mPbSignUpProgress.animate()
             .setDuration(shortAnimTime)
             .alpha((if (show) 1 else 0).toFloat())
             .setListener(object : AnimatorListenerAdapter() {
                 override fun onAnimationEnd(animation: Animator) {
-                    mScvSignUpForm.visibility = if (show) View.VISIBLE else View.GONE
+                    mPbSignUpProgress.visibility = if (show) View.VISIBLE else View.GONE
                 }
             })
     }
@@ -126,10 +127,11 @@ class SignUpActivity : BaseActivity() {
                 AuthApiManager().performSignUp(credentials)
                 true
             } catch (e: ConflictApiException) {
-                showErrorMessage("Email duplicate!") //TODO
+                et_SignInEmail.error = getString(R.string.msg_email_duplicate)
+                et_SignInEmail.requestFocus()
                 false
             } catch (e: InternalApiException) {
-                showErrorMessage("Server error!") //TODO
+                showErrorMessage(getString(R.string.msg_internal_server_error))
                 false
             } catch (e: InterruptedException) {
                 false
@@ -141,8 +143,7 @@ class SignUpActivity : BaseActivity() {
             showProgress(false)
 
             if (success) {
-                val intent = Intent(this@SignUpActivity, MainActivity::class.java)
-                startActivity(intent)
+                startActivity(Intent(this@SignUpActivity, SignInActivity::class.java))
                 finish()
             }
         }

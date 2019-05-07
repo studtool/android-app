@@ -26,4 +26,6 @@
     <string name="welcome_studtool">Добро пожаловать в Studtool</string>
     <string name="hello_studtool">Мы поможем сделать вашу учебу проще</string>
     <string name="error_passwords_mismatch">Пароли не совпадают</string>
+    <string name="msg_email_duplicate">Email duplicate</string>
+    <string name="msg_internal_server_error">Server error!</string>
 </resources>
