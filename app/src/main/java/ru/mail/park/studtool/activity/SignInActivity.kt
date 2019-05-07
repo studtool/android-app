@@ -14,6 +14,8 @@ import ru.mail.park.studtool.R
 import ru.mail.park.studtool.api.AuthApiManager
 import ru.mail.park.studtool.api.AuthInfo
 import ru.mail.park.studtool.api.Credentials
+import ru.mail.park.studtool.exception.InternalApiException
+import ru.mail.park.studtool.exception.UnauthorizedException
 import ru.mail.park.studtool.validator.CredentialsValidator
 
 class SignInActivity : BaseActivity() {
@@ -116,11 +118,11 @@ class SignInActivity : BaseActivity() {
         override fun doInBackground(vararg params: Void): AuthInfo? {
             return try {
                 AuthApiManager().performSignIn(mCredentials)
-            } catch (e: InterruptedException) { //TODO handle exceptions
+            } catch (e: UnauthorizedException) { //TODO handle exceptions
                 null
-            } catch (e: Exception) {
+            } catch (e: InternalApiException) {
                 null
-            } catch (e: java.lang.Exception) {
+            } catch (e: InterruptedException) {
                 null
             }
         }

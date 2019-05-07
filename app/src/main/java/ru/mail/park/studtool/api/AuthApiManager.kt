@@ -5,6 +5,7 @@ import okhttp3.Request
 import okhttp3.RequestBody
 import ru.mail.park.studtool.exception.ConflictApiException
 import ru.mail.park.studtool.exception.InternalApiException
+import ru.mail.park.studtool.exception.UnauthorizedException
 import java.util.*
 
 data class Credentials(
@@ -49,17 +50,21 @@ class AuthApiManager : ApiManager() {
             .url("$REQUEST_PREFIX/v0/auth/sessions")
             .post(body)
             .build()
+
         client.newCall(request).execute().use {
-            if (it.isSuccessful) {
-                val json = it.body()?.string()
-                if (json != null) {
-                    val info = fromJSON(json, AuthInfo::class.java)
+            when (it.code()) {
+                200 -> {
+                    val info = fromJSON(it.body()!!.string(), AuthInfo::class.java)
                     return info as AuthInfo
-                } else {
-                    throw InternalApiException("") //TODO handle
                 }
-            } else {
-                throw InternalApiException(it.message()) //TODO handle
+
+                404 -> {
+                    throw UnauthorizedException(null)
+                }
+
+                else -> {
+                    throw InternalApiException(it.body()?.string())
+                }
             }
         }
     }
