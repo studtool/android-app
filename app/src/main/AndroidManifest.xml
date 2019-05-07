@@ -42,7 +42,7 @@
                     android:value=".MainActivity"/>
         </activity>
         <activity
-                android:name=".SignInActivity"
+                android:name=".activity.SignInActivity"
                 android:label="@string/title_activity_login"
                 android:parentActivityName=".MainActivity">
             <meta-data
