@@ -13,10 +13,10 @@ data class Credentials(
 )
 
 data class AuthInfo(
-    var userId:       String = "",
-    var authToken:    String = "",
+    var userId: String = "",
+    var authToken: String = "",
     var refreshToken: String = "",
-    var expireTime:   String = "" //TODO
+    var expireTime: String = "" //TODO
 )
 
 class AuthApiManager : ApiManager() {

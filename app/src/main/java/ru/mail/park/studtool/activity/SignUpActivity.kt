@@ -7,6 +7,7 @@ import android.os.AsyncTask
 import android.os.Bundle
 import android.view.View
 import android.widget.*
+
 import ru.mail.park.studtool.MainActivity
 import ru.mail.park.studtool.R
 import ru.mail.park.studtool.api.AuthApiManager
