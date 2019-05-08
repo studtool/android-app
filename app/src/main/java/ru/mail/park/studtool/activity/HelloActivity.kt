@@ -7,6 +7,8 @@ import ru.mail.park.studtool.R
 
 class HelloActivity : BaseActivity() {
 
+    val FLAG_ACTIVITY_SINGLE_TOP :Int = 9
+
     private lateinit var mBtnSignIn: Button
     private lateinit var mBtnSignUp: Button
 

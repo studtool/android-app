@@ -2,6 +2,7 @@ package ru.mail.park.studtool.activity
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
 import android.view.View
@@ -9,6 +10,8 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ProgressBar
 import android.widget.ScrollView
+import ru.mail.park.studtool.ItemListActivity
+import ru.mail.park.studtool.MainActivity
 
 import ru.mail.park.studtool.R
 import ru.mail.park.studtool.api.AuthApiManager
@@ -136,6 +139,9 @@ class SignInActivity : BaseActivity() {
             if (authInfo != null) {
                 saveCredentials(mCredentials)
                 saveAuthInfo(authInfo)
+
+                val intent = Intent(this@SignInActivity, MainActivity::class.java)
+                startActivity(intent)
 
                 finish() //TODO show next activity
             }
