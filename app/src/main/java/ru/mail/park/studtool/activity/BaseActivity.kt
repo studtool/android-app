@@ -34,6 +34,15 @@ abstract class BaseActivity : AppCompatActivity() {
         return Credentials(email, password)
     }
 
+    fun deleteCredentials() {
+        val editor = getCredentialsSharedPreferences().edit()
+
+        editor.remove(CREDENTIALS_EMAIL_KEY)
+        editor.remove(CREDENTIALS_PASSWORD_KEY)
+
+        editor.apply()
+    }
+
     fun saveAuthInfo(authInfo: AuthInfo) {
         val editor = getAuthInfoSharedPreferences().edit()
 
@@ -54,6 +63,17 @@ abstract class BaseActivity : AppCompatActivity() {
         val expireTime = p.getString(AUTH_INFO_EXPIRE_TIME_KEY, null) ?: return null
 
         return AuthInfo(userId, authToken, refreshToken, getDateFormat().parse(expireTime))
+    }
+
+    fun deleteAuthInfo() {
+        val editor = getAuthInfoSharedPreferences().edit()
+
+        editor.remove(AUTH_INFO_USER_ID_KEY)
+        editor.remove(AUTH_INFO_AUTH_TOKEN_KEY)
+        editor.remove(AUTH_INFO_REFRESH_TOKEN_KEY)
+        editor.remove(AUTH_INFO_EXPIRE_TIME_KEY)
+
+        editor.apply()
     }
 
     private fun getCredentialsSharedPreferences(): SharedPreferences {
