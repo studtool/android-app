@@ -3,11 +3,18 @@ package ru.mail.park.studtool.activity
 import android.content.Context
 import android.content.SharedPreferences
 import android.support.v7.app.AppCompatActivity
+import android.widget.Toast
 import ru.mail.park.studtool.auth.AuthInfo
 import ru.mail.park.studtool.auth.Credentials
 import java.text.DateFormat
 
 abstract class BaseActivity : AppCompatActivity() {
+
+    fun showErrorMessage(message: String) {
+        runOnUiThread {
+            Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
+        }
+    }
 
     fun saveCredentials(credentials: Credentials) {
         val editor = getCredentialsSharedPreferences().edit()

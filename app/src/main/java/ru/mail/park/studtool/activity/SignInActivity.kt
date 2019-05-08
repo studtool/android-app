@@ -118,9 +118,11 @@ class SignInActivity : BaseActivity() {
         override fun doInBackground(vararg params: Void): AuthInfo? {
             return try {
                 AuthApiManager().performSignIn(mCredentials)
-            } catch (e: UnauthorizedException) { //TODO handle exceptions
+            } catch (e: UnauthorizedException) {
+                showErrorMessage(getString(R.string.msg_wrong_credentials))
                 null
             } catch (e: InternalApiException) {
+                showErrorMessage(getString(R.string.msg_internal_server_error))
                 null
             } catch (e: InterruptedException) {
                 null
@@ -132,9 +134,10 @@ class SignInActivity : BaseActivity() {
             showProgress(false)
 
             if (authInfo != null) {
-                finish() //TODO handle login
-            } else {
-                // TODO handle errors
+                saveCredentials(mCredentials)
+                saveAuthInfo(authInfo)
+
+                finish() //TODO show next activity
             }
         }
 

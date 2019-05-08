@@ -88,12 +88,6 @@ class SignUpActivity : BaseActivity() {
         }
     }
 
-    private fun showErrorMessage(message: String) {
-        runOnUiThread {
-            Toast.makeText(applicationContext, message, Toast.LENGTH_LONG).show()
-        }
-    }
-
     private fun showProgress(show: Boolean) {
         val shortAnimTime = resources.getInteger(android.R.integer.config_shortAnimTime).toLong()
 
