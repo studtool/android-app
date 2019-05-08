@@ -49,6 +49,14 @@ class SignInActivity : BaseActivity() {
         mBtnPerformSignIn.setOnClickListener { attemptSignIn() }
 
         mCredentialsValidator = CredentialsValidator()
+
+        if (savedInstanceState == null) {
+            val credentials = loadCredentials()
+            if (credentials != null) {
+                mEtSignInEmail.setText(credentials.email)
+                mEtSignInPassword.setText(credentials.password)
+            }
+        }
     }
 
     private fun setupActionBar() {
