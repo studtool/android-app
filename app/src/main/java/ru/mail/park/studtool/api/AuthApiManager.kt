@@ -21,9 +21,7 @@ class AuthApiManager : ApiManager() {
             .build()
         client.newCall(request).execute().use {
             when (it.code()) {
-                200 -> {
-                    val info = fromJSON(it.body()!!.string(), AuthInfo::class.java)
-                }
+                200 -> {}
 
                 409 -> {
                     throw ConflictApiException(null)
