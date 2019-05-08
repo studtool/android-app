@@ -29,4 +29,5 @@
     <string name="msg_email_duplicate">Email duplicate</string>
     <string name="msg_internal_server_error">Server error!</string>
     <string name="msg_wrong_credentials">Wrong email or password!</string>
+    <string name="button_file">Файлы</string>
 </resources>

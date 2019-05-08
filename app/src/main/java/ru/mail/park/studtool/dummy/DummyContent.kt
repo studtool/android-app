@@ -1,6 +1,9 @@
 package ru.mail.park.studtool.dummy
 
+import ru.mail.park.studtool.api.DocumentInfo
+import ru.mail.park.studtool.api.DocumentsApiManager
 import java.util.*
+import kotlin.collections.ArrayList
 
 /**
  * Helper class for providing sample content for user interfaces created by
@@ -13,26 +16,28 @@ object DummyContent {
     /**
      * An array of sample (dummy) items.
      */
-    val ITEMS: MutableList<DummyItem> = ArrayList()
+//    val ITEMS: MutableList<DummyItem> = ArrayList()
+    lateinit var ITEMS: Array<DocumentInfo>
 
     /**
      * A map of sample (dummy) items, by ID.
      */
-    val ITEM_MAP: MutableMap<String, DummyItem> = HashMap()
+    val ITEM_MAP: MutableMap<String, DocumentInfo> = HashMap()
 
     private val COUNT = 50
 
     init {
         // Add some sample items.
-        for (i in 1..COUNT) {
-            addItem(createDummyItem(i))
-        }
+//        for (i in 1..COUNT) {
+//            addItem(createDummyItem(i))
+//        }
+        ITEMS = DocumentsApiManager().getDocumentsList()
     }
 
-    private fun addItem(item: DummyItem) {
-        ITEMS.add(item)
-        ITEM_MAP.put(item.id, item)
-    }
+//    private fun addItem(item: DummyItem) {
+//        ITEMS.add(item)
+//        ITEM_MAP.put(item.id, item)
+//    }
 
     private fun createDummyItem(position: Int): DummyItem {
         return DummyItem(position.toString(), "Item " + position, makeDetails(position))

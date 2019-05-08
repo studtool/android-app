@@ -9,7 +9,7 @@ data class DocumentInfo(
     val title: String = "",
     val ownerId: String = "",
     val subject: String = "",
-    val documentMeta: DocumentMeta = DocumentMeta()
+    val meta: DocumentMeta = DocumentMeta()
 )
 
 data class DocumentMeta(

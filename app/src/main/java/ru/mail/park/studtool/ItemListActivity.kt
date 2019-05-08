@@ -14,6 +14,8 @@ import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_item_list.*
 import kotlinx.android.synthetic.main.item_list.*
 import kotlinx.android.synthetic.main.item_list_content.view.*
+import ru.mail.park.studtool.api.DocumentInfo
+import ru.mail.park.studtool.api.DocumentsApiManager
 import ru.mail.park.studtool.dummy.DummyContent
 
 /**
@@ -78,7 +80,7 @@ class ItemListActivity : AppCompatActivity() {
 
     class SimpleItemRecyclerViewAdapter(
         private val parentActivity: ItemListActivity,
-        private val values: List<DummyContent.DummyItem>,
+        private val values: Array<DocumentInfo>,
         private val twoPane: Boolean
     ) :
         RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
@@ -87,7 +89,7 @@ class ItemListActivity : AppCompatActivity() {
 
         init {
             onClickListener = View.OnClickListener { v ->
-                val item = v.tag as DummyContent.DummyItem
+                val item = v.tag as DocumentInfo
                 if (twoPane) {
                     val fragment = ItemDetailFragment().apply {
                         arguments = Bundle().apply {
@@ -116,7 +118,7 @@ class ItemListActivity : AppCompatActivity() {
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = values[position]
             holder.idView.text = item.id
-            holder.contentView.text = item.content
+            holder.contentView.text = item.title
 
             with(holder.itemView) {
                 tag = item
