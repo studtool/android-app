@@ -20,11 +20,17 @@ class AuthApiManager : ApiManager() {
             .post(body)
             .build()
         client.newCall(request).execute().use {
-            if (!it.isSuccessful && it.code() == 409) {
-                if (it.code() == 409) {
-                    throw ConflictApiException(it.message())
-                } else {
-                    throw InternalApiException(it.toString())
+            when (it.code()) {
+                200 -> {
+                    val info = fromJSON(it.body()!!.string(), AuthInfo::class.java)
+                }
+
+                409 -> {
+                    throw ConflictApiException(null)
+                }
+
+                else -> {
+                    throw InternalApiException(it.body()?.string())
                 }
             }
         }
