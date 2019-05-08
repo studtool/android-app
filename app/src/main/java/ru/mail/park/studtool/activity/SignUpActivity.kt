@@ -115,11 +115,11 @@ class SignUpActivity : BaseActivity() {
             })
     }
 
-    private inner class UserSignUpTask(private val credentials: Credentials) : AsyncTask<Void, Void, Boolean>() {
+    private inner class UserSignUpTask(private val mCredentials: Credentials) : AsyncTask<Void, Void, Boolean>() {
 
         override fun doInBackground(vararg params: Void): Boolean {
             return try {
-                AuthApiManager().performSignUp(credentials)
+                AuthApiManager().performSignUp(mCredentials)
                 true
             } catch (e: ConflictApiException) {
                 et_SignInEmail.error = getString(R.string.msg_email_duplicate)
@@ -138,6 +138,7 @@ class SignUpActivity : BaseActivity() {
             showProgress(false)
 
             if (success) {
+                saveCredentials(mCredentials)
                 startActivity(Intent(this@SignUpActivity, SignInActivity::class.java))
                 finish()
             }
