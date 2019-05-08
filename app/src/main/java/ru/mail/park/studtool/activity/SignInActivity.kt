@@ -12,8 +12,8 @@ import android.widget.ScrollView
 
 import ru.mail.park.studtool.R
 import ru.mail.park.studtool.api.AuthApiManager
-import ru.mail.park.studtool.api.AuthInfo
-import ru.mail.park.studtool.api.Credentials
+import ru.mail.park.studtool.auth.AuthInfo
+import ru.mail.park.studtool.auth.Credentials
 import ru.mail.park.studtool.exception.InternalApiException
 import ru.mail.park.studtool.exception.UnauthorizedException
 import ru.mail.park.studtool.validator.CredentialsValidator

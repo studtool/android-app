@@ -3,22 +3,11 @@ package ru.mail.park.studtool.api
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
+import ru.mail.park.studtool.auth.AuthInfo
+import ru.mail.park.studtool.auth.Credentials
 import ru.mail.park.studtool.exception.ConflictApiException
 import ru.mail.park.studtool.exception.InternalApiException
 import ru.mail.park.studtool.exception.UnauthorizedException
-import java.util.*
-
-data class Credentials(
-    val email: String,
-    val password: String
-)
-
-data class AuthInfo(
-    var userId: String = "",
-    var authToken: String = "",
-    var refreshToken: String = "",
-    var expireTime: Date = Date()
-)
 
 class AuthApiManager : ApiManager() {
     fun performSignUp(credentials: Credentials) {

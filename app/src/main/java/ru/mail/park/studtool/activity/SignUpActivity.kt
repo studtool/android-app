@@ -10,7 +10,7 @@ import android.widget.*
 import kotlinx.android.synthetic.main.activity_login.*
 import ru.mail.park.studtool.R
 import ru.mail.park.studtool.api.AuthApiManager
-import ru.mail.park.studtool.api.Credentials
+import ru.mail.park.studtool.auth.Credentials
 import ru.mail.park.studtool.exception.ConflictApiException
 import ru.mail.park.studtool.exception.InternalApiException
 import ru.mail.park.studtool.validator.CredentialsValidator
