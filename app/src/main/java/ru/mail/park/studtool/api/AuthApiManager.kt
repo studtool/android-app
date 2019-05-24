@@ -62,9 +62,11 @@ class AuthApiManager : ApiManager() {
     }
 
     fun performSignOut(authInfo: AuthInfo) {
+        val authHeader = getAuthHeader(authInfo)
+
         val request = Request.Builder()
             .url("$PROTECTED_REQUEST_V0_PREFIX/auth/session/${authInfo.sessionId}")
-            .header("Authorization", authInfo.authToken)
+            .header(authHeader.first, authHeader.second)
             .get()
             .build()
 
