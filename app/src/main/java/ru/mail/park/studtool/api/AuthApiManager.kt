@@ -14,7 +14,7 @@ class AuthApiManager : ApiManager() {
 
     fun performSignUp(credentials: Credentials) {
         val body = RequestBody
-            .create(mType, toJSON(credentials))
+            .create(mTypeJSON, toJSON(credentials))
         val request = Request.Builder()
             .url("$PUBLIC_REQUEST_V0_PREFIX/auth/profiles")
             .post(body)
@@ -37,7 +37,7 @@ class AuthApiManager : ApiManager() {
 
     fun performSignIn(credentials: Credentials): AuthInfo {
         val body = RequestBody
-            .create(mType, toJSON(credentials))
+            .create(mTypeJSON, toJSON(credentials))
         val request = Request.Builder()
             .url("$PUBLIC_REQUEST_V0_PREFIX/auth/sessions")
             .post(body)

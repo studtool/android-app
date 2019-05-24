@@ -18,7 +18,7 @@ open class ApiManager {
         const val PUBLIC_REQUEST_V0_PREFIX = "$REQUEST_V0_PREFIX/public"
         const val PROTECTED_REQUEST_V0_PREFIX = "$REQUEST_V0_PREFIX/protected"
 
-        val mType: MediaType = MediaType.get("application/json; charset=utf-8")
+        val mTypeJSON: MediaType = MediaType.get("application/json; charset=utf-8")
         private val mSerializer: Gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create()
 
         fun toJSON(obj: Any): String {

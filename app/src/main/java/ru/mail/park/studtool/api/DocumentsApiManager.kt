@@ -2,36 +2,22 @@ package ru.mail.park.studtool.api
 
 import okhttp3.OkHttpClient
 import okhttp3.Request
-import ru.mail.park.studtool.exception.ApiException
-
-data class DocumentInfo(
-    val id: String = "",
-    val title: String = "",
-    val ownerId: String = "",
-    val subject: String = "",
-    val meta: DocumentMeta = DocumentMeta()
-)
-
-data class DocumentMeta(
-    val size: Long = 0
-)
+import okhttp3.RequestBody
+import ru.mail.park.studtool.document.DocumentInfo
 
 class DocumentsApiManager : ApiManager() {
 
-    fun getDocumentsList(): Array<DocumentInfo> {
-        val client = OkHttpClient()
+    val mClient = OkHttpClient()
+
+    fun addDocument(documentInfo: DocumentInfo): DocumentInfo {
+        val body = RequestBody
+            .create(mTypeJSON, toJSON(documentInfo))
 
         val request = Request.Builder()
-            .url("$REQUEST_PREFIX/v0/documents")
-            .get()
+            .url("$PROTECTED_REQUEST_V0_PREFIX/documents")
+            .post(body)
             .build()
-        client.newCall(request).execute().use {
-            if (it.code() == 200) {
-                val info = fromJSON(it.body()!!.string(), Array<DocumentInfo>::class.java)
-                return info as Array<DocumentInfo>
-            } else {
-                throw ApiException(null)
-            }
-        }
+
+        TODO()
     }
 }
