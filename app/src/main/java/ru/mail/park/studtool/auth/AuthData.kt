@@ -11,5 +11,6 @@ data class AuthInfo(
     var userId: String = "",
     var authToken: String = "",
     var refreshToken: String = "",
+    var sessionId: String = "",
     var expireTime: Date = Date()
 )

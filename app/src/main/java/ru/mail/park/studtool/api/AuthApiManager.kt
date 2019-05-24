@@ -60,4 +60,24 @@ class AuthApiManager : ApiManager() {
             }
         }
     }
+
+    fun performSignOut(authInfo: AuthInfo) {
+        val request = Request.Builder()
+            .url("$PROTECTED_REQUEST_V0_PREFIX/auth/session/${authInfo.sessionId}")
+            .header("Authorization", authInfo.authToken)
+            .get()
+            .build()
+
+        mClient.newCall(request).execute().use {
+            when (it.code()) {
+                200 -> {
+                    return
+                }
+
+                else -> {
+                    throw InternalApiException(it.body()?.string())
+                }
+            }
+        }
+    }
 }
