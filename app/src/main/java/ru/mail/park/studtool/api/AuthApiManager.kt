@@ -10,18 +10,19 @@ import ru.mail.park.studtool.exception.InternalApiException
 import ru.mail.park.studtool.exception.UnauthorizedException
 
 class AuthApiManager : ApiManager() {
-    fun performSignUp(credentials: Credentials) {
-        val client = OkHttpClient()
+    private val mClient = OkHttpClient()
 
+    fun performSignUp(credentials: Credentials) {
         val body = RequestBody
             .create(mType, toJSON(credentials))
         val request = Request.Builder()
-            .url("$REQUEST_PREFIX/v0/auth/profiles")
+            .url("$PUBLIC_REQUEST_V0_PREFIX/auth/profiles")
             .post(body)
             .build()
-        client.newCall(request).execute().use {
+        mClient.newCall(request).execute().use {
             when (it.code()) {
-                200 -> {}
+                200 -> {
+                }
 
                 409 -> {
                     throw ConflictApiException(null)
@@ -35,16 +36,14 @@ class AuthApiManager : ApiManager() {
     }
 
     fun performSignIn(credentials: Credentials): AuthInfo {
-        val client = OkHttpClient()
-
         val body = RequestBody
             .create(mType, toJSON(credentials))
         val request = Request.Builder()
-            .url("$REQUEST_PREFIX/v0/auth/sessions")
+            .url("$PUBLIC_REQUEST_V0_PREFIX/auth/sessions")
             .post(body)
             .build()
 
-        client.newCall(request).execute().use {
+        mClient.newCall(request).execute().use {
             when (it.code()) {
                 200 -> {
                     val info = fromJSON(it.body()!!.string(), AuthInfo::class.java)

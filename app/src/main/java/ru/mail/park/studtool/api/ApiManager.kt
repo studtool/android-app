@@ -11,7 +11,12 @@ open class ApiManager {
         private const val HTTP_PROTO = "http"
         private const val SERVER_ADDRESS = "80.252.155.65:8000"
 
-        const val REQUEST_PREFIX = "$HTTP_PROTO://$SERVER_ADDRESS/api"
+        private const val REQUEST_PREFIX = "$HTTP_PROTO://$SERVER_ADDRESS/api"
+
+        private const val REQUEST_V0_PREFIX = "$REQUEST_PREFIX/v0"
+
+        const val PUBLIC_REQUEST_V0_PREFIX = "$REQUEST_V0_PREFIX/public"
+        const val PROTECTED_REQUEST_V0_PREFIX = "$REQUEST_V0_PREFIX/protected"
 
         val mType: MediaType = MediaType.get("application/json; charset=utf-8")
         private val mSerializer: Gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create()

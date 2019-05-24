@@ -2,7 +2,6 @@ package ru.mail.park.studtool
 
 import android.content.Intent
 import android.os.Bundle
-import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
@@ -20,7 +19,7 @@ class MainActivity : BaseActivity() {
 
         val button = findViewById<Button>(R.id.button_exit)
 
-        button.setOnClickListener{
+        button.setOnClickListener {
             deleteAuthInfo()
 
             val intent = Intent(this, HelloActivity::class.java)
