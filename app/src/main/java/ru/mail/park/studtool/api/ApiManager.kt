@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
 import okhttp3.MediaType
+import ru.mail.park.studtool.auth.AuthInfo
 import ru.mail.park.studtool.exception.InternalApiException
 
 open class ApiManager {
@@ -31,6 +32,10 @@ open class ApiManager {
             } catch (exception: JsonSyntaxException) {
                 throw InternalApiException(exception.message!!)
             }
+        }
+
+        fun getAuthHeader(authInfo: AuthInfo): Pair<String, String> {
+            return Pair("Authorization", "Bearer: ${authInfo.authToken}")
         }
     }
 }
