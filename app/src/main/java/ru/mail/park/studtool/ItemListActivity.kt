@@ -15,6 +15,21 @@ import kotlinx.android.synthetic.main.activity_item_list.*
 import kotlinx.android.synthetic.main.item_list.*
 import kotlinx.android.synthetic.main.item_list_content.view.*
 import ru.mail.park.studtool.dummy.DummyContent
+import android.R.string.cancel
+import android.content.DialogInterface
+import android.app.AlertDialog
+import android.app.Dialog
+import android.app.PendingIntent.getActivity
+import android.os.AsyncTask
+import android.widget.EditText
+import android.widget.Toast
+import ru.mail.park.studtool.activity.BaseActivity
+import ru.mail.park.studtool.api.DocumentsApiManager
+import ru.mail.park.studtool.auth.AuthInfo
+import ru.mail.park.studtool.document.DocumentInfo
+import ru.mail.park.studtool.exception.InternalApiException
+import ru.mail.park.studtool.exception.UnauthorizedException
+
 
 /**
  * An activity representing a list of Pings. This activity
@@ -24,13 +39,34 @@ import ru.mail.park.studtool.dummy.DummyContent
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-class ItemListActivity : AppCompatActivity() {
+class ItemListActivity : BaseActivity() {
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
     private var twoPane: Boolean = false
+    private var mDocumentTask: ItemListActivity.NewDocumentTask? = null
+
+
+    fun withEditText(view: View) {
+        val builder = AlertDialog.Builder(this)
+        val inflater = layoutInflater
+        builder.setTitle(R.string.create_file_title)
+        val dialogLayout = inflater.inflate(R.layout.dialog_new_document, null)
+        val editText  = dialogLayout.findViewById<EditText>(R.id.editText)
+        builder.setView(dialogLayout)
+        builder.setPositiveButton(R.string.create_new_document_button) {
+                dialogInterface, i ->
+            if (mDocumentTask == null){
+                val message = editText.text.toString()
+                mDocumentTask = NewDocumentTask(DocumentInfo(title = message, subject = "lol"), loadAuthInfo()!!)
+                mDocumentTask!!.execute(null as Void?)
+            }
+        }
+        builder.show()
+    }
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -40,8 +76,7 @@ class ItemListActivity : AppCompatActivity() {
         toolbar.title = title
 
         fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                .setAction("Action", null).show()
+            withEditText(view)
         }
         // Show the Up button in the action bar.
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -131,4 +166,34 @@ class ItemListActivity : AppCompatActivity() {
             val contentView: TextView = view.content
         }
     }
+
+    private inner class NewDocumentTask(private val mDocumentInfo: DocumentInfo, private val mAuthInfo: AuthInfo) : AsyncTask<Void, Void, DocumentInfo?>() {
+
+        override fun doInBackground(vararg params: Void): DocumentInfo? {
+            return try {
+                DocumentsApiManager().addDocument(mDocumentInfo, mAuthInfo)
+//                DocumentsApiManager().getDocumentsList("lol", loadAuthInfo()!!)[0]
+            } catch (e: UnauthorizedException) {
+                showErrorMessage(getString(R.string.msg_wrong_credentials))
+                null
+            } catch (e: InternalApiException) {
+                showErrorMessage(getString(R.string.msg_internal_server_error))
+                null
+            } catch (e: InterruptedException) {
+                null
+            }
+        }
+
+        override fun onPostExecute(documentInfo: DocumentInfo?) {
+            mDocumentTask = null
+
+            if (documentInfo != null) {
+
+
+                showErrorMessage("Создан: " + mDocumentInfo.title)
+//                finish() //TODO show next activity
+            }
+        }
+    }
+
 }

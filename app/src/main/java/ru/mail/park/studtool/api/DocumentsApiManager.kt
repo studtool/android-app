@@ -1,5 +1,6 @@
 package ru.mail.park.studtool.api
 
+import android.security.keystore.UserNotAuthenticatedException
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody
@@ -7,6 +8,7 @@ import ru.mail.park.studtool.auth.AuthInfo
 import ru.mail.park.studtool.document.DocumentInfo
 import ru.mail.park.studtool.exception.InternalApiException
 import ru.mail.park.studtool.exception.NotFoundApiException
+import ru.mail.park.studtool.exception.UnauthorizedException
 
 class DocumentsApiManager : ApiManager() {
 
@@ -29,6 +31,10 @@ class DocumentsApiManager : ApiManager() {
                 200 -> {
                     val info = fromJSON(it.body()!!.string(), DocumentInfo::class.java)
                     return info as DocumentInfo
+                }
+
+                401 -> {
+                    throw UnauthorizedException("not auth")
                 }
 
                 else -> {

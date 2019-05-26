@@ -35,7 +35,7 @@ open class ApiManager {
         }
 
         fun getAuthHeader(authInfo: AuthInfo): Pair<String, String> {
-            return Pair("Authorization", "Bearer: ${authInfo.authToken}")
+            return Pair("Authorization", "Bearer ${authInfo.authToken}")
         }
     }
 }

@@ -49,7 +49,7 @@ abstract class BaseActivity : AppCompatActivity() {
         editor.putString(AUTH_INFO_USER_ID_KEY, authInfo.userId)
         editor.putString(AUTH_INFO_AUTH_TOKEN_KEY, authInfo.authToken)
         editor.putString(AUTH_INFO_REFRESH_TOKEN_KEY, authInfo.refreshToken)
-        editor.putString(AUTH_INFO_EXPIRE_TIME_KEY, getDateFormat().format(authInfo.expireTime))
+        editor.putString(AUTH_INFO_EXPIRE_TIME_KEY, authInfo.expireTime)
 
         editor.apply()
     }
@@ -62,7 +62,7 @@ abstract class BaseActivity : AppCompatActivity() {
         val refreshToken = p.getString(AUTH_INFO_REFRESH_TOKEN_KEY, null) ?: return null
         val expireTime = p.getString(AUTH_INFO_EXPIRE_TIME_KEY, null) ?: return null
 
-        return AuthInfo(userId, authToken, refreshToken, getDateFormat().parse(expireTime))
+        return AuthInfo(userId, authToken, refreshToken, expireTime)
     }
 
     fun deleteAuthInfo() {

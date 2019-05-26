@@ -30,4 +30,9 @@
     <string name="msg_internal_server_error">Server error!</string>
     <string name="msg_wrong_credentials">Wrong email or password!</string>
     <string name="button_file">Файлы</string>
+    <string name="add_new_document">Введите название документа</string>
+    <string name="create_new_document_button">Создать</string>
+    <string name="create_file_title">Создание файла</string>
+    <string name="file_create_confirm">Создан</string>
+    <string name="file_create_error">Ошибка создания файла</string>
 </resources>
