@@ -10,7 +10,7 @@ import ru.mail.park.studtool.exception.InternalApiException
 open class ApiManager {
     companion object {
         private const val HTTP_PROTO = "http"
-        private const val SERVER_ADDRESS = "80.252.155.65:8000"
+        private const val SERVER_ADDRESS = "94.29.74.65:8000"
 
         private const val REQUEST_PREFIX = "$HTTP_PROTO://$SERVER_ADDRESS/api"
 

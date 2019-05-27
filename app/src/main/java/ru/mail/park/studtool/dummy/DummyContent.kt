@@ -19,14 +19,15 @@ import java.util.*
  * TODO: Replace all uses of this class before publishing your app.
  */
 object DummyContent : BaseActivity() {
-
-    private var mDocumentTask: DummyContent.GetDocumentsTask? = null
     /**
      * An array of sample (dummy) items.
      */
-    val ITEMS: MutableList<DummyItem> = ArrayList()
+    private var mDocumentTaskGetDocumentsTask: DummyContent.GetDocumentsTask? = null
 
-//    val DOCUMENTS: Array<DocumentInfo> ?= null
+    var DOCUMENTS: Array<DocumentInfo> = emptyArray()
+
+    var ITEMS: MutableList<DummyItem> = ArrayList()
+
     /**
      * A map of sample (dummy) items, by ID.
      */
@@ -36,6 +37,8 @@ object DummyContent : BaseActivity() {
 
     init {
         // Add some sample items.
+
+
         for (i in 1..COUNT) {
             addItem(createDummyItem(i))
         }
@@ -44,7 +47,11 @@ object DummyContent : BaseActivity() {
 //            mDocumentTask = GetDocumentsTask(loadAuthInfo()!!)
 //            mDocumentTask!!.execute(null as Void?)
 //        }
-
+//        if (mDocumentTaskGetDocumentsTask == null){
+//
+//        }
+//        mDocumentTaskGetDocumentsTask = GetDocumentsTask(loadAuthInfo()!!)
+//        mDocumentTaskGetDocumentsTask!!.execute(null as Void?)
     }
 
     private fun addItem(item: DummyItem) {
@@ -72,19 +79,32 @@ object DummyContent : BaseActivity() {
         override fun toString(): String = content
     }
 
-    private class GetDocumentsTask(private val mAuthInfo: AuthInfo) : AsyncTask<Void, Void, Array<DocumentInfo>>() {
+    private class GetDocumentsTask(private val mAuthInfo: AuthInfo) : AsyncTask<Void, Void, Array<DocumentInfo> >() {
+
         override fun doInBackground(vararg params: Void): Array<DocumentInfo> {
             return try {
-                DocumentsApiManager().getDocumentsList("lol", loadAuthInfo()!!)
+                DocumentsApiManager().getDocumentsList("lol", mAuthInfo)
             } catch (e: UnauthorizedException) {
                 showErrorMessage(getString(R.string.msg_wrong_credentials))
-                emptyArray()
+                emptyArray<DocumentInfo>()
             } catch (e: InternalApiException) {
                 showErrorMessage(getString(R.string.msg_internal_server_error))
-                emptyArray()
+                emptyArray<DocumentInfo>()
             } catch (e: InterruptedException) {
-                emptyArray()
+                emptyArray<DocumentInfo>()
             }
         }
+
+        override fun onPostExecute(documentsInfo: Array<DocumentInfo>) {
+            mDocumentTaskGetDocumentsTask = null
+
+            if (documentsInfo != null) {
+
+                DOCUMENTS = documentsInfo
+                showErrorMessage("Получено документов: " + DOCUMENTS.size)
+//                finish() //TODO show next activity
+            }
+        }
+
     }
 }

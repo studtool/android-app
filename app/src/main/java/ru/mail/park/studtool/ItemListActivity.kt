@@ -29,6 +29,7 @@ import ru.mail.park.studtool.auth.AuthInfo
 import ru.mail.park.studtool.document.DocumentInfo
 import ru.mail.park.studtool.exception.InternalApiException
 import ru.mail.park.studtool.exception.UnauthorizedException
+import java.util.ArrayList
 
 
 /**
@@ -47,6 +48,7 @@ class ItemListActivity : BaseActivity() {
      */
     private var twoPane: Boolean = false
     private var mDocumentTask: ItemListActivity.NewDocumentTask? = null
+    private var mDocumentTaskGetDocumentsTask: ItemListActivity.GetDocumentsTask? = null
 
 
     fun withEditText(view: View) {
@@ -63,6 +65,11 @@ class ItemListActivity : BaseActivity() {
                 mDocumentTask = NewDocumentTask(DocumentInfo(title = message, subject = "lol"), loadAuthInfo()!!)
                 mDocumentTask!!.execute(null as Void?)
             }
+            if (mDocumentTaskGetDocumentsTask == null){
+                mDocumentTaskGetDocumentsTask = GetDocumentsTask(loadAuthInfo()!!)
+                mDocumentTaskGetDocumentsTask!!.execute(null as Void?)
+            }
+
         }
         builder.show()
     }
@@ -70,6 +77,13 @@ class ItemListActivity : BaseActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        if (mDocumentTaskGetDocumentsTask != null){
+            return
+        }
+        mDocumentTaskGetDocumentsTask = GetDocumentsTask(loadAuthInfo()!!)
+        mDocumentTaskGetDocumentsTask!!.execute(null as Void?)
+
         setContentView(R.layout.activity_item_list)
 
         setSupportActionBar(toolbar)
@@ -90,6 +104,8 @@ class ItemListActivity : BaseActivity() {
         }
 
         setupRecyclerView(item_list)
+
+
     }
 
     override fun onOptionsItemSelected(item: MenuItem) =
@@ -108,12 +124,12 @@ class ItemListActivity : BaseActivity() {
         }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
-        recyclerView.adapter = SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, twoPane)
+        recyclerView.adapter = SimpleItemRecyclerViewAdapter(this, DummyContent.DOCUMENTS, twoPane)
     }
 
     class SimpleItemRecyclerViewAdapter(
         private val parentActivity: ItemListActivity,
-        private val values: List<DummyContent.DummyItem>,
+        private val values: Array<DocumentInfo>,
         private val twoPane: Boolean
     ) :
         RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
@@ -122,11 +138,11 @@ class ItemListActivity : BaseActivity() {
 
         init {
             onClickListener = View.OnClickListener { v ->
-                val item = v.tag as DummyContent.DummyItem
+                val item = v.tag as DocumentInfo
                 if (twoPane) {
                     val fragment = ItemDetailFragment().apply {
                         arguments = Bundle().apply {
-                            putString(ItemDetailFragment.ARG_ITEM_ID, item.id)
+                            putString(ItemDetailFragment.ARG_ITEM_ID, item.documentId)
                         }
                     }
                     parentActivity.supportFragmentManager
@@ -135,7 +151,7 @@ class ItemListActivity : BaseActivity() {
                         .commit()
                 } else {
                     val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
-                        putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id)
+                        putExtra(ItemDetailFragment.ARG_ITEM_ID, item.documentId)
                     }
                     v.context.startActivity(intent)
                 }
@@ -150,8 +166,8 @@ class ItemListActivity : BaseActivity() {
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = values[position]
-            holder.idView.text = item.id
-            holder.contentView.text = item.content
+            holder.idView.text = (position + 1).toString() //item.documentId
+            holder.contentView.text = item.title
 
             with(holder.itemView) {
                 tag = item
@@ -172,7 +188,6 @@ class ItemListActivity : BaseActivity() {
         override fun doInBackground(vararg params: Void): DocumentInfo? {
             return try {
                 DocumentsApiManager().addDocument(mDocumentInfo, mAuthInfo)
-//                DocumentsApiManager().getDocumentsList("lol", loadAuthInfo()!!)[0]
             } catch (e: UnauthorizedException) {
                 showErrorMessage(getString(R.string.msg_wrong_credentials))
                 null
@@ -189,11 +204,43 @@ class ItemListActivity : BaseActivity() {
 
             if (documentInfo != null) {
 
-
                 showErrorMessage("Создан: " + mDocumentInfo.title)
 //                finish() //TODO show next activity
             }
         }
+    }
+
+
+    private inner class GetDocumentsTask(private val mAuthInfo: AuthInfo) : AsyncTask<Void, Void, Array<DocumentInfo> >() {
+
+        override fun doInBackground(vararg params: Void): Array<DocumentInfo> {
+            return try {
+                DocumentsApiManager().getDocumentsList("lol", mAuthInfo)
+            } catch (e: UnauthorizedException) {
+                showErrorMessage(getString(R.string.msg_wrong_credentials))
+                emptyArray<DocumentInfo>()
+            } catch (e: InternalApiException) {
+                showErrorMessage(getString(R.string.msg_internal_server_error))
+                emptyArray<DocumentInfo>()
+            } catch (e: InterruptedException) {
+                emptyArray<DocumentInfo>()
+            }
+        }
+
+        override fun onPostExecute(documentsInfo: Array<DocumentInfo>) {
+            mDocumentTaskGetDocumentsTask = null
+
+            if (documentsInfo != null) {
+
+//                documentsInfo.copyInto(DOCUMENTS)
+
+                DummyContent.DOCUMENTS = documentsInfo
+                DummyContent.ITEMS.add(DummyContent.DummyItem("1", documentsInfo[0].title, documentsInfo[0].subject))
+                showErrorMessage("Получено документов " + DummyContent.DOCUMENTS.size)
+//                finish() //TODO show next activity
+            }
+        }
+
     }
 
 }

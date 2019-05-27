@@ -15,6 +15,7 @@ import ru.mail.park.studtool.api.DocumentsApiManager
 import ru.mail.park.studtool.auth.AuthInfo
 import ru.mail.park.studtool.auth.Credentials
 import ru.mail.park.studtool.document.DocumentInfo
+import ru.mail.park.studtool.dummy.DummyContent
 import ru.mail.park.studtool.exception.InternalApiException
 import ru.mail.park.studtool.exception.UnauthorizedException
 
@@ -22,12 +23,18 @@ const val EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE"
 
 class MainActivity : BaseActivity() {
 
-    private var mDocumentTask: GetDocumentsTask? = null
+    private var mDocumentTaskGetDocumentsTask: MainActivity.GetDocumentsTask? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        if (mDocumentTaskGetDocumentsTask != null){
+            return
+        }
+        mDocumentTaskGetDocumentsTask = GetDocumentsTask(loadAuthInfo()!!)
+        mDocumentTaskGetDocumentsTask!!.execute(null as Void?)
 
         val button = findViewById<Button>(R.id.button_exit)
 
@@ -42,13 +49,13 @@ class MainActivity : BaseActivity() {
     }
 
     fun sendMessage(view: View) {
-        if (mDocumentTask != null){
-            return
-        }
+//        if (mDocumentTask != null){
+//            return
+//        }
         val editText = findViewById<EditText>(R.id.editText)
         val message = editText.text.toString()
-        mDocumentTask = GetDocumentsTask(DocumentInfo(title = message, subject = "lol"), loadAuthInfo()!!)
-        mDocumentTask!!.execute(null as Void?)
+//        mDocumentTask = GetDocumentsTask(DocumentInfo(title = message, subject = "lol"), loadAuthInfo()!!)
+//        mDocumentTask!!.execute(null as Void?)
     }
 
     fun openItems(view: View) {
@@ -56,44 +63,36 @@ class MainActivity : BaseActivity() {
         startActivity(intent)
     }
 
-//    fun withEditText(view: View) {
-//        val builder = AlertDialog.Builder(this)
-//        val inflater = layoutInflater
-//        builder.setTitle("With EditText")
-//        val dialogLayout = inflater.inflate(R.layout.dialog_new_document, null)
-//        val editText  = dialogLayout.findViewById<EditText>(R.id.editText)
-//        builder.setView(dialogLayout)
-//        builder.setPositiveButton("OK") { dialogInterface, i -> Toast.makeText(applicationContext, "EditText is " + editText.text.toString(), Toast.LENGTH_SHORT).show() }
-//        builder.show()
-//    }
 
+    private inner class GetDocumentsTask(private val mAuthInfo: AuthInfo) : AsyncTask<Void, Void, Array<DocumentInfo> >() {
 
-    private inner class GetDocumentsTask(private val mDocumentInfo: DocumentInfo, private val mAuthInfo: AuthInfo) : AsyncTask<Void, Void, DocumentInfo?>() {
-
-        override fun doInBackground(vararg params: Void): DocumentInfo? {
+        override fun doInBackground(vararg params: Void): Array<DocumentInfo> {
             return try {
-//                DocumentsApiManager().addDocument(mDocumentInfo, mAuthInfo)
-                DocumentsApiManager().getDocumentsList("lol", loadAuthInfo()!!)[0]
+                DocumentsApiManager().getDocumentsList("lol", mAuthInfo)
             } catch (e: UnauthorizedException) {
                 showErrorMessage(getString(R.string.msg_wrong_credentials))
-                null
+                emptyArray<DocumentInfo>()
             } catch (e: InternalApiException) {
                 showErrorMessage(getString(R.string.msg_internal_server_error))
-                null
+                emptyArray<DocumentInfo>()
             } catch (e: InterruptedException) {
-                null
+                emptyArray<DocumentInfo>()
             }
         }
 
-        override fun onPostExecute(documentInfo: DocumentInfo?) {
-            mDocumentTask = null
+        override fun onPostExecute(documentsInfo: Array<DocumentInfo>) {
+            mDocumentTaskGetDocumentsTask = null
 
-            if (documentInfo != null) {
+            if (documentsInfo != null) {
 
+//                documentsInfo.copyInto(DOCUMENTS)
 
-                showErrorMessage("Документ создан " + documentInfo.title)
+                DummyContent.DOCUMENTS = documentsInfo
+                DummyContent.ITEMS.add(DummyContent.DummyItem("1", documentsInfo[0].title, documentsInfo[0].subject))
+                showErrorMessage("Получено документов " + DummyContent.DOCUMENTS.size)
 //                finish() //TODO show next activity
             }
         }
+
     }
 }
