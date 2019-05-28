@@ -48,16 +48,6 @@ class MainActivity : BaseActivity() {
 
     }
 
-    fun sendMessage(view: View) {
-//        if (mDocumentTask != null){
-//            return
-//        }
-        val editText = findViewById<EditText>(R.id.editText)
-        val message = editText.text.toString()
-//        mDocumentTask = GetDocumentsTask(DocumentInfo(title = message, subject = "lol"), loadAuthInfo()!!)
-//        mDocumentTask!!.execute(null as Void?)
-    }
-
     fun openItems(view: View) {
         val intent = Intent(this, ItemListActivity::class.java)
         startActivity(intent)
@@ -88,10 +78,17 @@ class MainActivity : BaseActivity() {
 //                documentsInfo.copyInto(DOCUMENTS)
 
                 DummyContent.DOCUMENTS = documentsInfo
-                DummyContent.ITEMS.add(DummyContent.DummyItem("1", documentsInfo[0].title, documentsInfo[0].subject))
-                showErrorMessage("Получено документов " + DummyContent.DOCUMENTS.size)
+//                showErrorMessage("Получено документов " + DummyContent.DOCUMENTS.size)
 //                finish() //TODO show next activity
             }
+        }
+
+        override fun onCancelled() {
+            super.onCancelled()
+            mDocumentTaskGetDocumentsTask = null
+
+            DummyContent.DOCUMENTS = emptyArray()
+
         }
 
     }

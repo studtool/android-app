@@ -48,7 +48,7 @@ class DocumentsApiManager : ApiManager() {
         val authHeader = getAuthHeader(authInfo)
 
         val request = Request.Builder()
-            .url("$PROTECTED_REQUEST_V0_PREFIX/documents?owner_id=${authInfo.userId}&subject=$subject")
+            .url("$PROTECTED_REQUEST_V0_PREFIX/documents?owner_id=${authInfo.userId}&subject=$subject&size=50")
             .header(authHeader.first, authHeader.second)
             .get()
             .build()
@@ -61,7 +61,8 @@ class DocumentsApiManager : ApiManager() {
                 }
 
                 404 -> {
-                    throw NotFoundApiException(it.body()?.string())
+                    return emptyArray()
+//                    throw NotFoundApiException(it.body()?.string())
                 }
 
                 else -> {
@@ -70,4 +71,66 @@ class DocumentsApiManager : ApiManager() {
             }
         }
     }
+
+
+    fun getDocumentsDetails(documentId: String, authInfo: AuthInfo): Array<DocumentInfo> {
+        val authHeader = getAuthHeader(authInfo)
+
+        val request = Request.Builder()
+            .url("$PROTECTED_REQUEST_V0_PREFIX/documents/${documentId}/content")
+            .header(authHeader.first, authHeader.second)
+            .get()
+            .build()
+
+        mClient.newCall(request).execute().use {
+            when (it.code()) {
+                200 -> {
+                    val info = fromJSON(it.body()!!.string(), Array<DocumentInfo>::class.java)
+                    return info as Array<DocumentInfo>
+                }
+
+                404 -> {
+                    return emptyArray()
+//                    throw NotFoundApiException(it.body()?.string())
+                }
+
+                else -> {
+                    throw InternalApiException(it.body()?.string())
+                }
+            }
+        }
+    }
+
+//    fun patchDocumentsDetails(documentId: String, authInfo: AuthInfo): Array<DocumentInfo> {
+//        val authHeader = getAuthHeader(authInfo)
+
+//        val body = RequestBody
+//            .create(mTypeJSON, toJSON(documentInfo))
+
+//        val request = Request.Builder()
+//            .url("$PROTECTED_REQUEST_V0_PREFIX/documents/${documentId}/content")
+//            .header(authHeader.first, authHeader.second)
+//            .patch(body)
+//            .build()
+//
+//        mClient.newCall(request).execute().use {
+//            when (it.code()) {
+//                200 -> {
+//                    val info = fromJSON(it.body()!!.string(), Array<DocumentInfo>::class.java)
+//                    return info as Array<DocumentInfo>
+//                }
+//
+//                404 -> {
+//                    return emptyArray()
+////                    throw NotFoundApiException(it.body()?.string())
+//                }
+//
+//                else -> {
+//                    throw InternalApiException(it.body()?.string())
+//                }
+//            }
+//        }
+//    }
+
+
 }

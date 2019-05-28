@@ -23,6 +23,8 @@ import android.app.PendingIntent.getActivity
 import android.os.AsyncTask
 import android.widget.EditText
 import android.widget.Toast
+import kotlinx.android.synthetic.main.item_detail.*
+import kotlinx.coroutines.awaitAll
 import ru.mail.park.studtool.activity.BaseActivity
 import ru.mail.park.studtool.api.DocumentsApiManager
 import ru.mail.park.studtool.auth.AuthInfo
@@ -60,14 +62,19 @@ class ItemListActivity : BaseActivity() {
         builder.setView(dialogLayout)
         builder.setPositiveButton(R.string.create_new_document_button) {
                 dialogInterface, i ->
+            val message = editText.text.toString()
             if (mDocumentTask == null){
-                val message = editText.text.toString()
                 mDocumentTask = NewDocumentTask(DocumentInfo(title = message, subject = "lol"), loadAuthInfo()!!)
                 mDocumentTask!!.execute(null as Void?)
             }
             if (mDocumentTaskGetDocumentsTask == null){
                 mDocumentTaskGetDocumentsTask = GetDocumentsTask(loadAuthInfo()!!)
                 mDocumentTaskGetDocumentsTask!!.execute(null as Void?)
+
+                val item = DummyContent.DOCUMENTS.last()
+                showErrorMessage("Всего документов " + DummyContent.DOCUMENTS.size)
+                finish();
+                startActivity(getIntent());
             }
 
         }
@@ -142,7 +149,7 @@ class ItemListActivity : BaseActivity() {
                 if (twoPane) {
                     val fragment = ItemDetailFragment().apply {
                         arguments = Bundle().apply {
-                            putString(ItemDetailFragment.ARG_ITEM_ID, item.documentId)
+                            putString(ItemDetailFragment.ARG_ITEM_ID, item.title)
                         }
                     }
                     parentActivity.supportFragmentManager
@@ -151,7 +158,7 @@ class ItemListActivity : BaseActivity() {
                         .commit()
                 } else {
                     val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
-                        putExtra(ItemDetailFragment.ARG_ITEM_ID, item.documentId)
+                        putExtra(ItemDetailFragment.ARG_ITEM_ID, item.title)
                     }
                     v.context.startActivity(intent)
                 }
@@ -204,7 +211,7 @@ class ItemListActivity : BaseActivity() {
 
             if (documentInfo != null) {
 
-                showErrorMessage("Создан: " + mDocumentInfo.title)
+//                showErrorMessage("Создан: " + mDocumentInfo.title)
 //                finish() //TODO show next activity
             }
         }
@@ -235,8 +242,7 @@ class ItemListActivity : BaseActivity() {
 //                documentsInfo.copyInto(DOCUMENTS)
 
                 DummyContent.DOCUMENTS = documentsInfo
-                DummyContent.ITEMS.add(DummyContent.DummyItem("1", documentsInfo[0].title, documentsInfo[0].subject))
-                showErrorMessage("Получено документов " + DummyContent.DOCUMENTS.size)
+//                showErrorMessage("Получено документов " + DummyContent.DOCUMENTS.size)
 //                finish() //TODO show next activity
             }
         }

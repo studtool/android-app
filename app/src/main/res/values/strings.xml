@@ -21,7 +21,7 @@
     <string name="permission_rationale">"Доступ к контактам необходим, чтобы автоматически заполнить ваш email"</string>
     <string name="title_activity_sign_up">Регистрация</string>
     <string name="promt_password_repeat">Повторите пароль</string>
-    <string name="title_item_list">Items</string>
+    <string name="title_item_list">Документы</string>
     <string name="title_item_detail">Item Detail</string>
     <string name="welcome_studtool">Добро пожаловать в Studtool</string>
     <string name="hello_studtool">Мы поможем сделать вашу учебу проще</string>
@@ -35,4 +35,10 @@
     <string name="create_file_title">Создание файла</string>
     <string name="file_create_confirm">Создан</string>
     <string name="file_create_error">Ошибка создания файла</string>
+    <string name="title_activity_main2">Main2Activity</string>
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="nav_header_title">Android Studio</string>
+    <string name="nav_header_subtitle">android.studio@android.com</string>
+    <string name="nav_header_desc">Navigation header</string>
 </resources>

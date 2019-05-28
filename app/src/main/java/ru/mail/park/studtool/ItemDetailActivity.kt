@@ -1,11 +1,19 @@
 package ru.mail.park.studtool
 
 import android.content.Intent
+import android.os.AsyncTask
 import android.os.Bundle
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.MenuItem
 import kotlinx.android.synthetic.main.activity_item_detail.*
+import ru.mail.park.studtool.activity.BaseActivity
+import ru.mail.park.studtool.api.DocumentsApiManager
+import ru.mail.park.studtool.auth.AuthInfo
+import ru.mail.park.studtool.document.DocumentInfo
+import ru.mail.park.studtool.dummy.DummyContent
+import ru.mail.park.studtool.exception.InternalApiException
+import ru.mail.park.studtool.exception.UnauthorizedException
 
 /**
  * An activity representing a single Item detail screen. This
@@ -13,7 +21,12 @@ import kotlinx.android.synthetic.main.activity_item_detail.*
  * item details are presented side-by-side with a list of items
  * in a [ItemListActivity].
  */
-class ItemDetailActivity : AppCompatActivity() {
+class ItemDetailActivity : BaseActivity() {
+
+    private var mDocumentTaskGetDocumentsTask: ItemDetailActivity.GetDocumentDetails? = null
+//
+//    mDocumentTaskGetDocumentsTask = GetDocumentDetails( it.documentId, )
+//    mDocumentTaskGetDocumentsTask!!.execute(null as Void?)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -69,4 +82,35 @@ class ItemDetailActivity : AppCompatActivity() {
             }
             else -> super.onOptionsItemSelected(item)
         }
+
+
+
+    private inner class GetDocumentDetails(private val documentId: String) : AsyncTask<Void, Void, Array<DocumentInfo>>() {
+
+        override fun doInBackground(vararg params: Void): Array<DocumentInfo> {
+            return try {
+                DocumentsApiManager().getDocumentsDetails(documentId, loadAuthInfo()!!)
+            } catch (e: UnauthorizedException) {
+                emptyArray<DocumentInfo>()
+            } catch (e: InternalApiException) {
+                emptyArray<DocumentInfo>()
+            } catch (e: InterruptedException) {
+                emptyArray<DocumentInfo>()
+            }
+        }
+
+        override fun onPostExecute(documentsInfo: Array<DocumentInfo>) {
+            mDocumentTaskGetDocumentsTask = null
+
+            if (documentsInfo != null) {
+
+//                documentsInfo.copyInto(DOCUMENTS)
+
+                DummyContent.DOCUMENTS = documentsInfo
+//                showErrorMessage("Получено документов " + DummyContent.DOCUMENTS.size)
+//                finish() //TODO show next activity
+            }
+        }
+
+    }
 }

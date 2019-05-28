@@ -22,7 +22,6 @@ object DummyContent : BaseActivity() {
     /**
      * An array of sample (dummy) items.
      */
-    private var mDocumentTaskGetDocumentsTask: DummyContent.GetDocumentsTask? = null
 
     var DOCUMENTS: Array<DocumentInfo> = emptyArray()
 
@@ -77,34 +76,5 @@ object DummyContent : BaseActivity() {
      */
     data class DummyItem(val id: String, val content: String, val details: String) {
         override fun toString(): String = content
-    }
-
-    private class GetDocumentsTask(private val mAuthInfo: AuthInfo) : AsyncTask<Void, Void, Array<DocumentInfo> >() {
-
-        override fun doInBackground(vararg params: Void): Array<DocumentInfo> {
-            return try {
-                DocumentsApiManager().getDocumentsList("lol", mAuthInfo)
-            } catch (e: UnauthorizedException) {
-                showErrorMessage(getString(R.string.msg_wrong_credentials))
-                emptyArray<DocumentInfo>()
-            } catch (e: InternalApiException) {
-                showErrorMessage(getString(R.string.msg_internal_server_error))
-                emptyArray<DocumentInfo>()
-            } catch (e: InterruptedException) {
-                emptyArray<DocumentInfo>()
-            }
-        }
-
-        override fun onPostExecute(documentsInfo: Array<DocumentInfo>) {
-            mDocumentTaskGetDocumentsTask = null
-
-            if (documentsInfo != null) {
-
-                DOCUMENTS = documentsInfo
-                showErrorMessage("Получено документов: " + DOCUMENTS.size)
-//                finish() //TODO show next activity
-            }
-        }
-
     }
 }
