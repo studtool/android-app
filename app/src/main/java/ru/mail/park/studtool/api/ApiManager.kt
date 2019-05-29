@@ -20,6 +20,7 @@ open class ApiManager {
         const val PROTECTED_REQUEST_V0_PREFIX = "$REQUEST_V0_PREFIX/protected"
 
         val mTypeJSON: MediaType = MediaType.get("application/json; charset=utf-8")
+        val mTypeByte: MediaType = MediaType.get("application/octet-stream; charset=utf-8")
         private val mSerializer: Gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create()
 
         fun toJSON(obj: Any): String {
@@ -36,6 +37,10 @@ open class ApiManager {
 
         fun getAuthHeader(authInfo: AuthInfo): Pair<String, String> {
             return Pair("Authorization", "Bearer ${authInfo.authToken}")
+        }
+
+        fun getAuthHeader(authToken: String): Pair<String, String> {
+            return Pair("Authorization", "Bearer ${authToken}")
         }
     }
 }

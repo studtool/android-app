@@ -58,7 +58,7 @@ class MainActivity : BaseActivity() {
 
         override fun doInBackground(vararg params: Void): Array<DocumentInfo> {
             return try {
-                DocumentsApiManager().getDocumentsList("lol", mAuthInfo)
+                DocumentsApiManager().getDocumentsList("subject", mAuthInfo)
             } catch (e: UnauthorizedException) {
                 showErrorMessage(getString(R.string.msg_wrong_credentials))
                 emptyArray<DocumentInfo>()

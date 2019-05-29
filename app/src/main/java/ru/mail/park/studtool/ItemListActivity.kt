@@ -51,6 +51,7 @@ class ItemListActivity : BaseActivity() {
     private var twoPane: Boolean = false
     private var mDocumentTask: ItemListActivity.NewDocumentTask? = null
     private var mDocumentTaskGetDocumentsTask: ItemListActivity.GetDocumentsTask? = null
+//    private var mDocumentTaskGetDocumentDetailsTask: ItemListActivity.GetDocumentDetails? = null
 
 
     fun withEditText(view: View) {
@@ -90,6 +91,13 @@ class ItemListActivity : BaseActivity() {
         }
         mDocumentTaskGetDocumentsTask = GetDocumentsTask(loadAuthInfo()!!)
         mDocumentTaskGetDocumentsTask!!.execute(null as Void?)
+
+//        TODO REMOVE
+//        if (mDocumentTaskGetDocumentDetailsTask != null){
+//            return
+//        }
+//        mDocumentTaskGetDocumentDetailsTask = GetDocumentDetails(DummyContent.DOCUMENTS.last().documentId)
+//        mDocumentTaskGetDocumentDetailsTask!!.execute(null as Void?)
 
         setContentView(R.layout.activity_item_list)
 
@@ -131,10 +139,11 @@ class ItemListActivity : BaseActivity() {
         }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
-        recyclerView.adapter = SimpleItemRecyclerViewAdapter(this, DummyContent.DOCUMENTS, twoPane)
+        recyclerView.adapter = SimpleItemRecyclerViewAdapter(loadAuthInfo()!!,this, DummyContent.DOCUMENTS, twoPane)
     }
 
     class SimpleItemRecyclerViewAdapter(
+        private val authInfo: AuthInfo,
         private val parentActivity: ItemListActivity,
         private val values: Array<DocumentInfo>,
         private val twoPane: Boolean
@@ -146,10 +155,13 @@ class ItemListActivity : BaseActivity() {
         init {
             onClickListener = View.OnClickListener { v ->
                 val item = v.tag as DocumentInfo
+
                 if (twoPane) {
                     val fragment = ItemDetailFragment().apply {
                         arguments = Bundle().apply {
-                            putString(ItemDetailFragment.ARG_ITEM_ID, item.title)
+                            putString(ItemDetailFragment.ARG_ITEM_TITLE, item.title)
+                            putString(ItemDetailFragment.ARG_ITEM_ID, item.documentId)
+                            putString(ItemDetailFragment.ARG_AUTH, authInfo.authToken)
                         }
                     }
                     parentActivity.supportFragmentManager
@@ -158,7 +170,9 @@ class ItemListActivity : BaseActivity() {
                         .commit()
                 } else {
                     val intent = Intent(v.context, ItemDetailActivity::class.java).apply {
-                        putExtra(ItemDetailFragment.ARG_ITEM_ID, item.title)
+                        putExtra(ItemDetailFragment.ARG_ITEM_TITLE, item.title)
+                        putExtra(ItemDetailFragment.ARG_ITEM_ID, item.documentId)
+                        putExtra(ItemDetailFragment.ARG_AUTH, authInfo.authToken)
                     }
                     v.context.startActivity(intent)
                 }
@@ -222,7 +236,7 @@ class ItemListActivity : BaseActivity() {
 
         override fun doInBackground(vararg params: Void): Array<DocumentInfo> {
             return try {
-                DocumentsApiManager().getDocumentsList("lol", mAuthInfo)
+                DocumentsApiManager().getDocumentsList("subject", mAuthInfo)
             } catch (e: UnauthorizedException) {
                 showErrorMessage(getString(R.string.msg_wrong_credentials))
                 emptyArray<DocumentInfo>()
@@ -248,5 +262,36 @@ class ItemListActivity : BaseActivity() {
         }
 
     }
+
+
+
+//    private inner class GetDocumentDetails(private val documentId: String) : AsyncTask<Void, Void, String>() {
+//
+//        override fun doInBackground(vararg params: Void): String {
+//            return try {
+//                DocumentsApiManager().getDocumentsDetails(documentId, loadAuthInfo()!!)
+//            } catch (e: UnauthorizedException) {
+//                return ""
+//            } catch (e: InternalApiException) {
+//                return ""
+//            } catch (e: InterruptedException) {
+//                return ""
+//            }
+//        }
+//
+//        fun onPostExecute(documentsInfo: Array<DocumentInfo>) {
+//            mDocumentTaskGetDocumentDetailsTask = null
+//
+//            if (documentsInfo != null) {
+//
+////                documentsInfo.copyInto(DOCUMENTS)
+//
+////                DummyContent.DOCUMENTS = documentsInfo
+////                showErrorMessage("Получено документов " + DummyContent.DOCUMENTS.size)
+////                finish() //TODO show next activity
+//            }
+//        }
+//
+//    }
 
 }
