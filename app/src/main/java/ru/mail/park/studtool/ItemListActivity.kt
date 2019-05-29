@@ -65,15 +65,15 @@ class ItemListActivity : BaseActivity() {
                 dialogInterface, i ->
             val message = editText.text.toString()
             if (mDocumentTask == null){
-                mDocumentTask = NewDocumentTask(DocumentInfo(title = message, subject = "lol"), loadAuthInfo()!!)
+                mDocumentTask = NewDocumentTask(DocumentInfo(title = message, subject = "subject"), loadAuthInfo()!!)
                 mDocumentTask!!.execute(null as Void?)
             }
             if (mDocumentTaskGetDocumentsTask == null){
                 mDocumentTaskGetDocumentsTask = GetDocumentsTask(loadAuthInfo()!!)
                 mDocumentTaskGetDocumentsTask!!.execute(null as Void?)
 
-                val item = DummyContent.DOCUMENTS.last()
-                showErrorMessage("Всего документов " + DummyContent.DOCUMENTS.size)
+                Thread.sleep(1_000)
+                showErrorMessage("Создан " + message)
                 finish();
                 startActivity(getIntent());
             }
@@ -92,12 +92,6 @@ class ItemListActivity : BaseActivity() {
         mDocumentTaskGetDocumentsTask = GetDocumentsTask(loadAuthInfo()!!)
         mDocumentTaskGetDocumentsTask!!.execute(null as Void?)
 
-//        TODO REMOVE
-//        if (mDocumentTaskGetDocumentDetailsTask != null){
-//            return
-//        }
-//        mDocumentTaskGetDocumentDetailsTask = GetDocumentDetails(DummyContent.DOCUMENTS.last().documentId)
-//        mDocumentTaskGetDocumentDetailsTask!!.execute(null as Void?)
 
         setContentView(R.layout.activity_item_list)
 
@@ -265,33 +259,5 @@ class ItemListActivity : BaseActivity() {
 
 
 
-//    private inner class GetDocumentDetails(private val documentId: String) : AsyncTask<Void, Void, String>() {
-//
-//        override fun doInBackground(vararg params: Void): String {
-//            return try {
-//                DocumentsApiManager().getDocumentsDetails(documentId, loadAuthInfo()!!)
-//            } catch (e: UnauthorizedException) {
-//                return ""
-//            } catch (e: InternalApiException) {
-//                return ""
-//            } catch (e: InterruptedException) {
-//                return ""
-//            }
-//        }
-//
-//        fun onPostExecute(documentsInfo: Array<DocumentInfo>) {
-//            mDocumentTaskGetDocumentDetailsTask = null
-//
-//            if (documentsInfo != null) {
-//
-////                documentsInfo.copyInto(DOCUMENTS)
-//
-////                DummyContent.DOCUMENTS = documentsInfo
-////                showErrorMessage("Получено документов " + DummyContent.DOCUMENTS.size)
-////                finish() //TODO show next activity
-//            }
-//        }
-//
-//    }
 
 }
