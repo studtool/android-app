@@ -15,7 +15,7 @@ class CredentialsValidator {
         if (password.isEmpty()) {
             return Pair(false, "Password is empty!")
         }
-        if (password.length < 8) {
+        if (password.length < 4) {
             return Pair(false, "Password too short!")
         }
         return Pair(true, null)

@@ -61,13 +61,11 @@ class DocumentsApiManager : ApiManager() {
                 }
 
                 404 -> {
-                    return emptyArray()
-//                    throw NotFoundApiException(it.body()?.string())
+                    throw NotFoundApiException(it.body()?.string())
                 }
 
                 else -> {
-                    return emptyArray()
-//                    throw InternalApiException(it.body()?.string())
+                    throw InternalApiException(it.body()?.string())
                 }
             }
         }
@@ -91,13 +89,11 @@ class DocumentsApiManager : ApiManager() {
                 }
 
                 404 -> {
-                    return ""
-//                    throw NotFoundApiException(it.body()?.string())
+                    throw NotFoundApiException(it.body()?.string())
                 }
 
                 else -> {
-                    return ""
-//                    throw InternalApiException(it.body()?.string())
+                    throw InternalApiException(it.body()?.string())
                 }
             }
         }

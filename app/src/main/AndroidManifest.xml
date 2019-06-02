@@ -16,6 +16,16 @@
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
         <activity
+                android:name=".SidebarActivity"
+                android:label="@string/title_activity_sidebar"
+                android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
+                android:name=".NavigationActivity"
+                android:label="@string/title_activity_navigation"
+                android:theme="@style/AppTheme.NoActionBar">
+        </activity>
+        <activity
                 android:name=".ItemListActivity"
                 android:label="@string/title_item_list"
                 android:parentActivityName=".MainActivity"

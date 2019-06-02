@@ -46,6 +46,14 @@ class MainActivity : BaseActivity() {
             finish()
         }
 
+        val buttonTest = findViewById<Button>(R.id.button)
+
+        buttonTest.setOnClickListener {
+            val intent = Intent(this, NavigationActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
     }
 
     fun openItems(view: View) {

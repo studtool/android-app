@@ -258,6 +258,4 @@ class ItemListActivity : BaseActivity() {
     }
 
 
-
-
 }

@@ -34,7 +34,7 @@ class ItemDetailActivity : BaseActivity() {
 
     private var mDocumentTaskGetDocumentDetailsTask: ItemDetailActivity.GetDocumentDetails? = null
     private var mDocumentTaskPatchDocumentDetailsTask: ItemDetailActivity.PatchDocumentDetails? = null
-    var documentData: String? = "lol"
+    var documentData: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
