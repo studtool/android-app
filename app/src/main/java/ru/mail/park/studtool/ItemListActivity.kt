@@ -1,37 +1,27 @@
 package ru.mail.park.studtool
 
+import android.app.AlertDialog
 import android.content.Intent
+import android.os.AsyncTask
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v4.app.NavUtils
-import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_item_list.*
 import kotlinx.android.synthetic.main.item_list.*
 import kotlinx.android.synthetic.main.item_list_content.view.*
-import ru.mail.park.studtool.dummy.DummyContent
-import android.R.string.cancel
-import android.content.DialogInterface
-import android.app.AlertDialog
-import android.app.Dialog
-import android.app.PendingIntent.getActivity
-import android.os.AsyncTask
-import android.widget.EditText
-import android.widget.Toast
-import kotlinx.android.synthetic.main.item_detail.*
-import kotlinx.coroutines.awaitAll
 import ru.mail.park.studtool.activity.BaseActivity
 import ru.mail.park.studtool.api.DocumentsApiManager
 import ru.mail.park.studtool.auth.AuthInfo
 import ru.mail.park.studtool.document.DocumentInfo
+import ru.mail.park.studtool.dummy.DummyContent
 import ru.mail.park.studtool.exception.InternalApiException
 import ru.mail.park.studtool.exception.UnauthorizedException
-import java.util.ArrayList
 
 
 /**
@@ -59,16 +49,15 @@ class ItemListActivity : BaseActivity() {
         val inflater = layoutInflater
         builder.setTitle(R.string.create_file_title)
         val dialogLayout = inflater.inflate(R.layout.dialog_new_document, null)
-        val editText  = dialogLayout.findViewById<EditText>(R.id.editText)
+        val editText = dialogLayout.findViewById<EditText>(R.id.editText)
         builder.setView(dialogLayout)
-        builder.setPositiveButton(R.string.create_new_document_button) {
-                dialogInterface, i ->
+        builder.setPositiveButton(R.string.create_new_document_button) { dialogInterface, i ->
             val message = editText.text.toString()
-            if (mDocumentTask == null){
+            if (mDocumentTask == null) {
                 mDocumentTask = NewDocumentTask(DocumentInfo(title = message, subject = "subject"), loadAuthInfo()!!)
                 mDocumentTask!!.execute(null as Void?)
             }
-            if (mDocumentTaskGetDocumentsTask == null){
+            if (mDocumentTaskGetDocumentsTask == null) {
                 mDocumentTaskGetDocumentsTask = GetDocumentsTask(loadAuthInfo()!!)
                 mDocumentTaskGetDocumentsTask!!.execute(null as Void?)
 
@@ -86,7 +75,7 @@ class ItemListActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        if (mDocumentTaskGetDocumentsTask != null){
+        if (mDocumentTaskGetDocumentsTask != null) {
             return
         }
         mDocumentTaskGetDocumentsTask = GetDocumentsTask(loadAuthInfo()!!)
@@ -133,7 +122,7 @@ class ItemListActivity : BaseActivity() {
         }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
-        recyclerView.adapter = SimpleItemRecyclerViewAdapter(loadAuthInfo()!!,this, DummyContent.DOCUMENTS, twoPane)
+        recyclerView.adapter = SimpleItemRecyclerViewAdapter(loadAuthInfo()!!, this, DummyContent.DOCUMENTS, twoPane)
     }
 
     class SimpleItemRecyclerViewAdapter(
@@ -198,7 +187,8 @@ class ItemListActivity : BaseActivity() {
         }
     }
 
-    private inner class NewDocumentTask(private val mDocumentInfo: DocumentInfo, private val mAuthInfo: AuthInfo) : AsyncTask<Void, Void, DocumentInfo?>() {
+    private inner class NewDocumentTask(private val mDocumentInfo: DocumentInfo, private val mAuthInfo: AuthInfo) :
+        AsyncTask<Void, Void, DocumentInfo?>() {
 
         override fun doInBackground(vararg params: Void): DocumentInfo? {
             return try {
@@ -226,7 +216,8 @@ class ItemListActivity : BaseActivity() {
     }
 
 
-    private inner class GetDocumentsTask(private val mAuthInfo: AuthInfo) : AsyncTask<Void, Void, Array<DocumentInfo> >() {
+    private inner class GetDocumentsTask(private val mAuthInfo: AuthInfo) :
+        AsyncTask<Void, Void, Array<DocumentInfo>>() {
 
         override fun doInBackground(vararg params: Void): Array<DocumentInfo> {
             return try {

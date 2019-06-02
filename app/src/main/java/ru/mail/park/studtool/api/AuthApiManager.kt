@@ -7,7 +7,7 @@ import ru.mail.park.studtool.auth.AuthInfo
 import ru.mail.park.studtool.auth.Credentials
 import ru.mail.park.studtool.exception.ConflictApiException
 import ru.mail.park.studtool.exception.InternalApiException
-import ru.mail.park.studtool.exception.UnauthorizedException
+import ru.mail.park.studtool.exception.NotFoundApiException
 
 class AuthApiManager : ApiManager() {
     private val mClient = OkHttpClient()
@@ -19,19 +19,23 @@ class AuthApiManager : ApiManager() {
             .url("$PUBLIC_REQUEST_V0_PREFIX/auth/profiles")
             .post(body)
             .build()
-        mClient.newCall(request).execute().use {
-            when (it.code()) {
-                200 -> {
-                }
+        try {
+            mClient.newCall(request).execute().use {
+                when (it.code()) {
+                    200 -> {
+                    }
 
-                409 -> {
-                    throw ConflictApiException(null)
-                }
+                    409 -> {
+                        throw ConflictApiException(null)
+                    }
 
-                else -> {
-                    throw InternalApiException(it.body()?.string())
+                    else -> {
+                        throw InternalApiException(it.body()?.string())
+                    }
                 }
             }
+        } catch (exc: Exception) {
+            throw InternalApiException(exc.message)
         }
     }
 
@@ -43,21 +47,53 @@ class AuthApiManager : ApiManager() {
             .post(body)
             .build()
 
-        mClient.newCall(request).execute().use {
-            when (it.code()) {
-                200 -> {
-                    val info = fromJSON(it.body()!!.string(), AuthInfo::class.java)
-                    return info as AuthInfo
-                }
+        try {
+            mClient.newCall(request).execute().use { response ->
+                when (response.code()) {
+                    200 -> {
+                        return parseJSONBody(response)
+                    }
 
-                404 -> {
-                    throw UnauthorizedException(null)
-                }
+                    404 -> {
+                        throw NotFoundApiException(null)
+                    }
 
-                else -> {
-                    throw InternalApiException(it.body()?.string())
+                    else -> {
+                        throw InternalApiException(null)
+                    }
                 }
             }
+        } catch (exc: Exception) {
+            throw InternalApiException(exc.message)
+        }
+    }
+
+    fun performSessionUpdate(authInfo: AuthInfo): AuthInfo {
+        val body = RequestBody
+            .create(mTypeJSON, toJSON(authInfo))
+        val request = Request.Builder()
+            .url("$PUBLIC_REQUEST_V0_PREFIX/auth/sessions/${authInfo.sessionId}")
+            .post(body)
+            .build()
+
+        try {
+            mClient.newCall(request).execute().use { response ->
+                when (response.code()) {
+                    200 -> {
+                        return parseJSONBody(response)
+                    }
+
+                    404 -> {
+                        throw NotFoundApiException(null)
+                    }
+
+                    else -> {
+                        throw InternalApiException(null)
+                    }
+                }
+            }
+        } catch (exc: Exception) {
+            throw InternalApiException(exc.message)
         }
     }
 
@@ -70,16 +106,23 @@ class AuthApiManager : ApiManager() {
             .get()
             .build()
 
-        mClient.newCall(request).execute().use {
-            when (it.code()) {
-                200 -> {
-                    return
-                }
+        try {
+            mClient.newCall(request).execute().use { response ->
+                when (response.code()) {
+                    200 -> {
+                    }
 
-                else -> {
-                    throw InternalApiException(it.body()?.string())
+                    404 -> {
+                        throw NotFoundApiException(null)
+                    }
+
+                    else -> {
+                        throw InternalApiException(null)
+                    }
                 }
             }
+        } catch (exc: Exception) {
+            throw InternalApiException(exc.message)
         }
     }
 }

@@ -1,19 +1,14 @@
 package ru.mail.park.studtool
 
-import android.app.AlertDialog
 import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import android.widget.EditText
-import android.widget.Toast
 import ru.mail.park.studtool.activity.BaseActivity
 import ru.mail.park.studtool.activity.HelloActivity
-import ru.mail.park.studtool.api.AuthApiManager
 import ru.mail.park.studtool.api.DocumentsApiManager
 import ru.mail.park.studtool.auth.AuthInfo
-import ru.mail.park.studtool.auth.Credentials
 import ru.mail.park.studtool.document.DocumentInfo
 import ru.mail.park.studtool.dummy.DummyContent
 import ru.mail.park.studtool.exception.InternalApiException
@@ -30,7 +25,7 @@ class MainActivity : BaseActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        if (mDocumentTaskGetDocumentsTask != null){
+        if (mDocumentTaskGetDocumentsTask != null) {
             return
         }
         mDocumentTaskGetDocumentsTask = GetDocumentsTask(loadAuthInfo()!!)
@@ -62,7 +57,8 @@ class MainActivity : BaseActivity() {
     }
 
 
-    private inner class GetDocumentsTask(private val mAuthInfo: AuthInfo) : AsyncTask<Void, Void, Array<DocumentInfo> >() {
+    private inner class GetDocumentsTask(private val mAuthInfo: AuthInfo) :
+        AsyncTask<Void, Void, Array<DocumentInfo>>() {
 
         override fun doInBackground(vararg params: Void): Array<DocumentInfo> {
             return try {

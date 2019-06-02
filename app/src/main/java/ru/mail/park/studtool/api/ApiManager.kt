@@ -4,6 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.google.gson.JsonSyntaxException
 import okhttp3.MediaType
+import okhttp3.Response
 import ru.mail.park.studtool.auth.AuthInfo
 import ru.mail.park.studtool.exception.InternalApiException
 
@@ -16,12 +17,13 @@ open class ApiManager {
 
         private const val REQUEST_V0_PREFIX = "$REQUEST_PREFIX/v0"
 
+        private val mSerializer: Gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create()
+
         const val PUBLIC_REQUEST_V0_PREFIX = "$REQUEST_V0_PREFIX/public"
         const val PROTECTED_REQUEST_V0_PREFIX = "$REQUEST_V0_PREFIX/protected"
 
         val mTypeJSON: MediaType = MediaType.get("application/json; charset=utf-8")
         val mTypeByte: MediaType = MediaType.get("application/octet-stream; charset=utf-8")
-        private val mSerializer: Gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create()
 
         fun toJSON(obj: Any): String {
             return mSerializer.toJson(obj)
@@ -39,8 +41,14 @@ open class ApiManager {
             return Pair("Authorization", "Bearer ${authInfo.authToken}")
         }
 
-        fun getAuthHeader(authToken: String): Pair<String, String> {
-            return Pair("Authorization", "Bearer ${authToken}")
+        inline fun <reified T> parseJSONBody(response: Response): T {
+            val body = response.body()
+            if (response.body() == null) {
+                throw InternalApiException("response body is empty")
+            }
+            return cast(fromJSON(body!!.string(), T::class.java))
         }
+
+        inline fun <reified T> cast(any: Any?): T = any as T
     }
 }
