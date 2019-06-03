@@ -1,15 +1,7 @@
 package ru.mail.park.studtool.dummy
 
-import android.os.AsyncTask
-import android.widget.EditText
-import ru.mail.park.studtool.MainActivity
-import ru.mail.park.studtool.R
 import ru.mail.park.studtool.activity.BaseActivity
-import ru.mail.park.studtool.api.DocumentsApiManager
-import ru.mail.park.studtool.auth.AuthInfo
 import ru.mail.park.studtool.document.DocumentInfo
-import ru.mail.park.studtool.exception.InternalApiException
-import ru.mail.park.studtool.exception.UnauthorizedException
 import java.util.*
 
 /**

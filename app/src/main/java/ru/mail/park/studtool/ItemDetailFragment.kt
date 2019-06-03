@@ -1,24 +1,12 @@
 package ru.mail.park.studtool
 
-import android.os.AsyncTask
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.v4.app.Fragment
-import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
 import kotlinx.android.synthetic.main.activity_item_detail.*
-import kotlinx.android.synthetic.main.item_detail.*
-import kotlinx.android.synthetic.main.item_detail.view.*
-import ru.mail.park.studtool.activity.BaseActivity
-import ru.mail.park.studtool.api.DocumentsApiManager
-import ru.mail.park.studtool.auth.AuthInfo
 import ru.mail.park.studtool.document.DocumentInfo
-import ru.mail.park.studtool.dummy.DummyContent
-import ru.mail.park.studtool.exception.InternalApiException
-import ru.mail.park.studtool.exception.UnauthorizedException
 
 /**
  * A fragment representing a single Item detail screen.
@@ -33,7 +21,7 @@ class ItemDetailFragment : Fragment() {
      */
     private var item: DocumentInfo? = null
     private var auth: String? = null
-//    private var mDocumentTaskGetDocumentDetailsTask: ItemDetailFragment.GetDocumentDetails? = null
+    //    private var mDocumentTaskGetDocumentDetailsTask: ItemDetailFragment.GetDocumentDetails? = null
 //    private var mDocumentTaskPatchDocumentDetailsTask: ItemDetailFragment.PatchDocumentDetails? = null
     var documentData: String? = ""
 
@@ -44,10 +32,10 @@ class ItemDetailFragment : Fragment() {
 
         arguments?.let {
             if (
-                    it.containsKey(ARG_AUTH)
-                    && it.containsKey(ARG_ITEM_ID)
-                    && it.containsKey(ARG_ITEM_TITLE)
-                ) {
+                it.containsKey(ARG_AUTH)
+                && it.containsKey(ARG_ITEM_ID)
+                && it.containsKey(ARG_ITEM_TITLE)
+            ) {
                 // Load the dummy content specified by the fragment
                 // arguments. In a real-world scenario, use a Loader
                 // to load content from a content provider.
@@ -88,14 +76,11 @@ class ItemDetailFragment : Fragment() {
         const val ARG_ITEM_TITLE = "item_title"
         const val ARG_ITEM_ID = "item_id"
         const val ARG_AUTH = "auth"
-        fun lol(): String{
+        fun lol(): String {
 
             return "lol"
         }
     }
-
-
-
 
 
 }

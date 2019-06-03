@@ -3,19 +3,12 @@ package ru.mail.park.studtool
 import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
-import android.support.design.widget.Snackbar
-import android.support.v7.app.AppCompatActivity
 import android.text.Editable
 import android.view.MenuItem
-import android.view.View
 import android.widget.EditText
 import kotlinx.android.synthetic.main.activity_item_detail.*
-import kotlinx.android.synthetic.main.item_detail.view.*
 import ru.mail.park.studtool.activity.BaseActivity
 import ru.mail.park.studtool.api.DocumentsApiManager
-import ru.mail.park.studtool.auth.AuthInfo
-import ru.mail.park.studtool.document.DocumentInfo
-import ru.mail.park.studtool.dummy.DummyContent
 import ru.mail.park.studtool.exception.InternalApiException
 import ru.mail.park.studtool.exception.UnauthorizedException
 
@@ -44,7 +37,7 @@ class ItemDetailActivity : BaseActivity() {
 
 
         fab.setOnClickListener { view ->
-//            val inflater = layoutInflater
+            //            val inflater = layoutInflater
 //            val itemLayout = inflater.inflate(R.layout.item_detail, null)
 //            val editText  = itemLayout.findViewById<EditText>(R.id.item_detail)
 //            val message = editText.text.toString()
@@ -53,7 +46,7 @@ class ItemDetailActivity : BaseActivity() {
             val editText = findViewById<EditText>(R.id.item_detail)
             val message = editText.text.toString()
 
-            if (mDocumentTaskPatchDocumentDetailsTask == null){
+            if (mDocumentTaskPatchDocumentDetailsTask == null) {
                 mDocumentTaskPatchDocumentDetailsTask = PatchDocumentDetails(
                     intent.getStringExtra(ItemDetailFragment.ARG_ITEM_ID),
                     message,
@@ -106,7 +99,7 @@ class ItemDetailActivity : BaseActivity() {
 
         val editText = findViewById<EditText>(R.id.item_detail)
 
-        if (mDocumentTaskGetDocumentDetailsTask == null){
+        if (mDocumentTaskGetDocumentDetailsTask == null) {
             mDocumentTaskGetDocumentDetailsTask = GetDocumentDetails(
                 intent.getStringExtra(ItemDetailFragment.ARG_ITEM_ID),
                 intent.getStringExtra(ItemDetailFragment.ARG_AUTH),
@@ -116,7 +109,6 @@ class ItemDetailActivity : BaseActivity() {
         }
 
         this.toolbar_layout?.title = intent.getStringExtra(ItemDetailFragment.ARG_ITEM_TITLE)
-
 
 
 //        editText.text = Editable.Factory.getInstance().newEditable(documentData)
@@ -141,8 +133,11 @@ class ItemDetailActivity : BaseActivity() {
         }
 
 
-
-    private inner class GetDocumentDetails(private val documentId: String, private val authToken: String, private val editText: EditText) : AsyncTask<Void, Void, String>() {
+    private inner class GetDocumentDetails(
+        private val documentId: String,
+        private val authToken: String,
+        private val editText: EditText
+    ) : AsyncTask<Void, Void, String>() {
 
         override fun doInBackground(vararg params: Void): String {
             return try {
@@ -174,7 +169,11 @@ class ItemDetailActivity : BaseActivity() {
     }
 
 
-    inner class PatchDocumentDetails(private val documentId: String, private val data: String,private val authToken: String) : AsyncTask<Void, Void, String>() {
+    inner class PatchDocumentDetails(
+        private val documentId: String,
+        private val data: String,
+        private val authToken: String
+    ) : AsyncTask<Void, Void, String>() {
 
         override fun doInBackground(vararg params: Void): String {
             return try {

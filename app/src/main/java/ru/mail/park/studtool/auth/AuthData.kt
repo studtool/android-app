@@ -1,7 +1,5 @@
 package ru.mail.park.studtool.auth
 
-import java.util.*
-
 data class Credentials(
     val email: String,
     val password: String
