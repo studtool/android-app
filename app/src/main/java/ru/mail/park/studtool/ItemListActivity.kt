@@ -228,7 +228,7 @@ class ItemListActivity : BaseActivity() {
                 showErrorMessage(getString(R.string.msg_wrong_credentials))
                 emptyArray<DocumentInfo>()
             } catch (e: InternalApiException) {
-//                showErrorMessage(getString(R.string.msg_internal_server_error))
+                showErrorMessage("Нет созданных документов")
                 emptyArray<DocumentInfo>()
             } catch (e: NotFoundApiException) {
                 emptyArray<DocumentInfo>()
