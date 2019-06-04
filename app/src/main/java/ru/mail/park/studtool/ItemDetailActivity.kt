@@ -9,6 +9,7 @@ import android.widget.EditText
 import kotlinx.android.synthetic.main.activity_item_detail.*
 import ru.mail.park.studtool.activity.BaseActivity
 import ru.mail.park.studtool.api.DocumentsApiManager
+import ru.mail.park.studtool.auth.AuthInfo
 import ru.mail.park.studtool.exception.InternalApiException
 import ru.mail.park.studtool.exception.UnauthorizedException
 
@@ -141,7 +142,7 @@ class ItemDetailActivity : BaseActivity() {
 
         override fun doInBackground(vararg params: Void): String {
             return try {
-                DocumentsApiManager().getDocumentsDetails(documentId, authToken)
+                String( DocumentsApiManager().getDocumentContent(documentId, AuthInfo(authToken=authToken)))
             } catch (e: UnauthorizedException) {
                 return ""
             } catch (e: InternalApiException) {
@@ -162,7 +163,7 @@ class ItemDetailActivity : BaseActivity() {
                 documentData = result
                 editText.text = Editable.Factory.getInstance().newEditable(documentData)
 
-//                showErrorMessage("Получено документов " + DummyContent.DOCUMENTS.size)
+//                showErrorMessage("Получено документов " + result)
 //                finish() //TODO show next activity
             }
         }
@@ -177,7 +178,11 @@ class ItemDetailActivity : BaseActivity() {
 
         override fun doInBackground(vararg params: Void): String {
             return try {
-                DocumentsApiManager().patchDocumentsDetails(documentId, data, authToken)
+                DocumentsApiManager().setDocumentContent(
+                    documentId,
+                    data.toByteArray(),
+                    AuthInfo(authToken=authToken)
+                ).toString()
             } catch (e: UnauthorizedException) {
                 return ""
             } catch (e: InternalApiException) {

@@ -12,13 +12,14 @@ import ru.mail.park.studtool.auth.AuthInfo
 import ru.mail.park.studtool.document.DocumentInfo
 import ru.mail.park.studtool.dummy.DummyContent
 import ru.mail.park.studtool.exception.InternalApiException
+import ru.mail.park.studtool.exception.NotFoundApiException
 import ru.mail.park.studtool.exception.UnauthorizedException
 
 const val EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE"
 
 class MainActivity : BaseActivity() {
 
-    private var mDocumentTaskGetDocumentsTask: MainActivity.GetDocumentsTask? = null
+    private var mDocumentTaskGetDocumentsTask: GetDocumentsTask? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -41,13 +42,13 @@ class MainActivity : BaseActivity() {
             finish()
         }
 
-        val buttonTest = findViewById<Button>(R.id.button)
-
-        buttonTest.setOnClickListener {
-            val intent = Intent(this, NavigationActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
+//        val buttonTest = findViewById<Button>(R.id.button)
+//
+//        buttonTest.setOnClickListener {
+//            val intent = Intent(this, NavigationActivity::class.java)
+//            startActivity(intent)
+//            finish()
+//        }
 
     }
 
@@ -55,6 +56,7 @@ class MainActivity : BaseActivity() {
         val intent = Intent(this, ItemListActivity::class.java)
         startActivity(intent)
     }
+
 
 
     private inner class GetDocumentsTask(private val mAuthInfo: AuthInfo) :
@@ -69,6 +71,8 @@ class MainActivity : BaseActivity() {
             } catch (e: InternalApiException) {
                 showErrorMessage(getString(R.string.msg_internal_server_error))
                 emptyArray<DocumentInfo>()
+            } catch (e: NotFoundApiException) {
+                emptyArray<DocumentInfo>()
             } catch (e: InterruptedException) {
                 emptyArray<DocumentInfo>()
             }
@@ -82,17 +86,12 @@ class MainActivity : BaseActivity() {
 //                documentsInfo.copyInto(DOCUMENTS)
 
                 DummyContent.DOCUMENTS = documentsInfo
+//                finish();
+//                startActivity(getIntent());
+
 //                showErrorMessage("Получено документов " + DummyContent.DOCUMENTS.size)
 //                finish() //TODO show next activity
             }
-        }
-
-        override fun onCancelled() {
-            super.onCancelled()
-            mDocumentTaskGetDocumentsTask = null
-
-            DummyContent.DOCUMENTS = emptyArray()
-
         }
 
     }

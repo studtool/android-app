@@ -1,8 +1,6 @@
 package ru.mail.park.studtool.api
 
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import okhttp3.RequestBody
+import okhttp3.*
 import ru.mail.park.studtool.auth.AuthInfo
 import ru.mail.park.studtool.auth.Credentials
 import ru.mail.park.studtool.exception.ConflictApiException

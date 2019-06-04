@@ -13,6 +13,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.TextView
 import kotlinx.android.synthetic.main.activity_item_list.*
+import kotlinx.android.synthetic.main.activity_settings.*
 import kotlinx.android.synthetic.main.item_list.*
 import kotlinx.android.synthetic.main.item_list_content.view.*
 import ru.mail.park.studtool.activity.BaseActivity
@@ -21,6 +22,7 @@ import ru.mail.park.studtool.auth.AuthInfo
 import ru.mail.park.studtool.document.DocumentInfo
 import ru.mail.park.studtool.dummy.DummyContent
 import ru.mail.park.studtool.exception.InternalApiException
+import ru.mail.park.studtool.exception.NotFoundApiException
 import ru.mail.park.studtool.exception.UnauthorizedException
 
 
@@ -56,15 +58,11 @@ class ItemListActivity : BaseActivity() {
             if (mDocumentTask == null) {
                 mDocumentTask = NewDocumentTask(DocumentInfo(title = message, subject = "subject"), loadAuthInfo()!!)
                 mDocumentTask!!.execute(null as Void?)
-            }
-            if (mDocumentTaskGetDocumentsTask == null) {
-                mDocumentTaskGetDocumentsTask = GetDocumentsTask(loadAuthInfo()!!)
-                mDocumentTaskGetDocumentsTask!!.execute(null as Void?)
-
                 Thread.sleep(1_000)
-                showErrorMessage("Создан " + message)
                 finish();
                 startActivity(getIntent());
+            } else {
+                return@setPositiveButton
             }
 
         }
@@ -75,17 +73,24 @@ class ItemListActivity : BaseActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        // TODO (update view after loading)
+        /*
+        TODO
+        в изначальном состоянии загружать из локальной БД
+        при получении данных обновлять view
+         */
         if (mDocumentTaskGetDocumentsTask != null) {
             return
         }
         mDocumentTaskGetDocumentsTask = GetDocumentsTask(loadAuthInfo()!!)
         mDocumentTaskGetDocumentsTask!!.execute(null as Void?)
 
+        Thread.sleep(1_000)
 
+//        mDocumentTaskGetDocumentsTask
         setContentView(R.layout.activity_item_list)
-
-        setSupportActionBar(toolbar)
-        toolbar.title = title
+        setSupportActionBar(toolbar_1)
+        toolbar_1.title = title
 
         fab.setOnClickListener { view ->
             withEditText(view)
@@ -206,11 +211,8 @@ class ItemListActivity : BaseActivity() {
 
         override fun onPostExecute(documentInfo: DocumentInfo?) {
             mDocumentTask = null
-
             if (documentInfo != null) {
-
-//                showErrorMessage("Создан: " + mDocumentInfo.title)
-//                finish() //TODO show next activity
+                showErrorMessage("Создан: " + mDocumentInfo.title)
             }
         }
     }
@@ -228,6 +230,8 @@ class ItemListActivity : BaseActivity() {
             } catch (e: InternalApiException) {
                 showErrorMessage(getString(R.string.msg_internal_server_error))
                 emptyArray<DocumentInfo>()
+            } catch (e: NotFoundApiException) {
+                emptyArray<DocumentInfo>()
             } catch (e: InterruptedException) {
                 emptyArray<DocumentInfo>()
             }
@@ -241,6 +245,9 @@ class ItemListActivity : BaseActivity() {
 //                documentsInfo.copyInto(DOCUMENTS)
 
                 DummyContent.DOCUMENTS = documentsInfo
+//                finish();
+//                startActivity(getIntent());
+
 //                showErrorMessage("Получено документов " + DummyContent.DOCUMENTS.size)
 //                finish() //TODO show next activity
             }
