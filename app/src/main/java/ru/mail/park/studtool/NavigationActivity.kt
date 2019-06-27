@@ -1,6 +1,7 @@
 package ru.mail.park.studtool
 
 import android.app.AlertDialog
+import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.NavigationView
@@ -13,24 +14,34 @@ import kotlinx.android.synthetic.main.activity_navigation.*
 import kotlinx.android.synthetic.main.app_bar_sidebar.*
 import kotlinx.android.synthetic.main.nav_header_sidebar.view.*
 import ru.mail.park.studtool.activity.BaseActivity
-import android.content.Intent
 import android.os.AsyncTask
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.View
 import android.widget.EditText
-import kotlinx.android.synthetic.main.activity_item_list.*
-import kotlinx.android.synthetic.main.fragment_home.*
 import ru.mail.park.studtool.api.DocumentsApiManager
 import ru.mail.park.studtool.auth.AuthInfo
 import ru.mail.park.studtool.document.DocumentInfo
+import ru.mail.park.studtool.dummy.DummyContent
 import ru.mail.park.studtool.exception.InternalApiException
 import ru.mail.park.studtool.exception.UnauthorizedException
-import ru.mail.park.studtool.home.HomeFragment
+import ru.mail.park.studtool.list.ItemDetailFragment
+import ru.mail.park.studtool.list.ListFragment
+import ru.mail.park.studtool.logic.Logic
 import java.util.ArrayList
 
-class NavigationActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener {
+class NavigationActivity : BaseActivity(), NavigationView.OnNavigationItemSelectedListener, NavigationInterface {
 
-    private var mDocumentTask: NewDocumentTask? = null
+    private var mDocumentTask: Logic.NewDocumentTask? = null
+    private var mGetDocumentTask: Logic.GetDocumentsTask? = null
+    private var mGetDocumentDetailsTask: Logic.GetDocumentDetailsTask? = null
+
+    private lateinit var authInfo: AuthInfo
+
+    private var mMessage: String = ""
+    private var mStatusOK: Boolean = false
+
+    private lateinit var mData: Array<DocumentInfo>
 
     fun withEditText(view: View) {
         val builder = AlertDialog.Builder(this)
@@ -42,10 +53,18 @@ class NavigationActivity : BaseActivity(), NavigationView.OnNavigationItemSelect
         builder.setPositiveButton(R.string.create_new_document_button) { dialogInterface, i ->
             val message = editText.text.toString()
             if (mDocumentTask == null) {
-                mDocumentTask = NewDocumentTask(DocumentInfo(title = message, subject = "subject"), loadAuthInfo()!!)
+                mDocumentTask = Logic.NewDocumentTask(
+                    mDocumentTask,
+                    DocumentInfo(title = message, subject = "subject"),
+                    loadAuthInfo()!!, mStatusOK
+                )
                 mDocumentTask!!.execute(null as Void?)
+
                 Thread.sleep(1_000)
 
+                if (!mStatusOK) {
+                    showErrorMessage("Ошибка создания файла")
+                }
             } else {
                 return@setPositiveButton
             }
@@ -54,43 +73,21 @@ class NavigationActivity : BaseActivity(), NavigationView.OnNavigationItemSelect
         builder.show()
     }
 
-
-    val fragment1: Fragment = HomeFragment()
-//        .apply {
-//        arguments = Bundle().apply {
-//            putString("AUTH_INFO", loadAuthInfo()!!.authToken)
-//        }
-//    }
-    val fragment2: Fragment = DashboardFragment()
-    val fragment3: Fragment = NotificationsFragment()
-    val fm = supportFragmentManager
-    var active = fragment1
-
-    private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
-        when (item.itemId) {
-            R.id.navigation_home -> {
-                fm.beginTransaction().hide(active).show(fragment1).commit();
-                active = fragment1;
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_dashboard -> {
-                fm.beginTransaction().hide(active).show(fragment2).commit();
-                active = fragment2;
-                return@OnNavigationItemSelectedListener true
-            }
-            R.id.navigation_notifications -> {
-                fm.beginTransaction().hide(active).show(fragment3).commit();
-                active = fragment3;
-                return@OnNavigationItemSelectedListener true
-            }
+    override fun openFile(item: DocumentInfo) {
+        super.openFile(item)
+        val intent = Intent(this, ItemDetailActivity::class.java).apply {
+            putExtra(ItemDetailFragment.ARG_ITEM_TITLE, item.title)
+            putExtra(ItemDetailFragment.ARG_ITEM_ID, item.documentId)
         }
-        false
+        startActivity(intent)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_navigation)
 
+        Logic.GetDocumentsTask(mGetDocumentTask, loadAuthInfo()!!, mStatusOK, mMessage)
 
         setSupportActionBar(toolbar_lol)
 
@@ -102,6 +99,41 @@ class NavigationActivity : BaseActivity(), NavigationView.OnNavigationItemSelect
         toggle.syncState()
 
         nav_view.setNavigationItemSelectedListener(this)
+
+
+        var mDataArray = DummyContent.DOCUMENTS
+
+        var mDataMutableList: MutableList<DocumentInfo> = mDataArray.toMutableList()
+
+        var mData = mDataMutableList as ArrayList<DocumentInfo>
+
+        val fragment1: Fragment = ListFragment.newInstance(DummyContent.DOCUMENTS)
+        val fragment2: Fragment = DashboardFragment()
+        val fragment3: Fragment = NotificationsFragment()
+
+        val fm = supportFragmentManager
+        var active = fragment1
+
+        val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
+            when (item.itemId) {
+                R.id.navigation_home -> {
+                    fm.beginTransaction().hide(active).show(fragment1).commit();
+                    active = fragment1;
+                    return@OnNavigationItemSelectedListener true
+                }
+                R.id.navigation_dashboard -> {
+                    fm.beginTransaction().hide(active).show(fragment2).commit();
+                    active = fragment2;
+                    return@OnNavigationItemSelectedListener true
+                }
+                R.id.navigation_notifications -> {
+                    fm.beginTransaction().hide(active).show(fragment3).commit();
+                    active = fragment3;
+                    return@OnNavigationItemSelectedListener true
+                }
+            }
+            false
+        }
 
         navigation.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
@@ -164,32 +196,5 @@ class NavigationActivity : BaseActivity(), NavigationView.OnNavigationItemSelect
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
-    }
-
-
-
-    private inner class NewDocumentTask(private val mDocumentInfo: DocumentInfo, private val mAuthInfo: AuthInfo) :
-        AsyncTask<Void, Void, DocumentInfo?>() {
-
-        override fun doInBackground(vararg params: Void): DocumentInfo? {
-            return try {
-                DocumentsApiManager().addDocument(mDocumentInfo, mAuthInfo)
-            } catch (e: UnauthorizedException) {
-                showErrorMessage(getString(R.string.msg_wrong_credentials))
-                null
-            } catch (e: InternalApiException) {
-                showErrorMessage(getString(R.string.msg_internal_server_error))
-                null
-            } catch (e: InterruptedException) {
-                null
-            }
-        }
-
-        override fun onPostExecute(documentInfo: DocumentInfo?) {
-            mDocumentTask = null
-            if (documentInfo != null) {
-                showErrorMessage("Создан: " + mDocumentInfo.title)
-            }
-        }
     }
 }

@@ -4,14 +4,18 @@ import android.content.Intent
 import android.os.AsyncTask
 import android.os.Bundle
 import android.text.Editable
+import android.util.Log
 import android.view.MenuItem
 import android.widget.EditText
 import kotlinx.android.synthetic.main.activity_item_detail.*
+import kotlinx.android.synthetic.main.fragment_document_detail.*
 import ru.mail.park.studtool.activity.BaseActivity
 import ru.mail.park.studtool.api.DocumentsApiManager
 import ru.mail.park.studtool.auth.AuthInfo
 import ru.mail.park.studtool.exception.InternalApiException
 import ru.mail.park.studtool.exception.UnauthorizedException
+import ru.mail.park.studtool.list.ItemDetailFragment
+import ru.mail.park.studtool.logic.Logic
 
 /**
  * An activity representing a single Item detail screen. This
@@ -26,40 +30,42 @@ class ItemDetailActivity : BaseActivity() {
 //    mDocumentTaskGetDocumentsTask = GetDocumentDetails( it.documentId, )
 //    mDocumentTaskGetDocumentsTask!!.execute(null as Void?)
 
-    private var mDocumentTaskGetDocumentDetailsTask: ItemDetailActivity.GetDocumentDetails? = null
-    private var mDocumentTaskPatchDocumentDetailsTask: ItemDetailActivity.PatchDocumentDetails? = null
+    private var mDocumentTaskGetDocumentDetailsTask: Logic.GetDocumentDetailsTask? = null
+    private var mDocumentTaskPatchDocumentDetailsTask: Logic.PatchDocumentDetailsTask? = null
     var documentData: String? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_item_detail)
+        setContentView(R.layout.fragment_document_detail)
         setSupportActionBar(detail_toolbar)
 
 
-        fab.setOnClickListener { view ->
-            //            val inflater = layoutInflater
-//            val itemLayout = inflater.inflate(R.layout.item_detail, null)
-//            val editText  = itemLayout.findViewById<EditText>(R.id.item_detail)
+//        fab.setOnClickListener { view ->
+//            //            val inflater = layoutInflater
+////            val itemLayout = inflater.inflate(R.layout.item_detail, null)
+////            val editText  = itemLayout.findViewById<EditText>(R.id.item_detail)
+////            val message = editText.text.toString()
+//
+//
+//            val editText = findViewById<EditText>(R.id.item_detail)
 //            val message = editText.text.toString()
-
-
-            val editText = findViewById<EditText>(R.id.item_detail)
-            val message = editText.text.toString()
-
-            if (mDocumentTaskPatchDocumentDetailsTask == null) {
-                mDocumentTaskPatchDocumentDetailsTask = PatchDocumentDetails(
-                    intent.getStringExtra(ItemDetailFragment.ARG_ITEM_ID),
-                    message,
-                    intent.getStringExtra(ItemDetailFragment.ARG_AUTH)
-                )
-                mDocumentTaskPatchDocumentDetailsTask!!.execute(null as Void?)
-            }
-
-//            Snackbar.make(view, "data" + message, Snackbar.LENGTH_LONG)
-//                .setAction("Action", null).
-//                    show()
-        }
+//
+//            if (mDocumentTaskPatchDocumentDetailsTask == null) {
+//                mDocumentTaskPatchDocumentDetailsTask = Logic.PatchDocumentDetailsTask(
+//                    mDocumentTaskPatchDocumentDetailsTask,
+//                    intent.getStringExtra(ItemDetailFragment.ARG_ITEM_ID),
+//                    message,
+//                    loadAuthInfo()!!.authToken
+////                    intent.getStringExtra(ItemDetailFragment.ARG_AUTH)
+//                )
+//                mDocumentTaskPatchDocumentDetailsTask!!.execute(null as Void?)
+//            }
+//
+////            Snackbar.make(view, "data" + message, Snackbar.LENGTH_LONG)
+////                .setAction("Action", null).
+////                    show()
+//        }
 
         // Show the Up button in the action bar.
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
@@ -73,6 +79,7 @@ class ItemDetailActivity : BaseActivity() {
         //
         // http://developer.android.com/guide/components/fragments.html
         //
+
 //        if (savedInstanceState == null) {
 //            // Create the detail fragment and add it to the activity
 //            // using a fragment transaction.
@@ -86,10 +93,6 @@ class ItemDetailActivity : BaseActivity() {
 //                        ItemDetailFragment.ARG_ITEM_TITLE,
 //                        intent.getStringExtra(ItemDetailFragment.ARG_ITEM_TITLE)
 //                    )
-//                    putString(
-//                        ItemDetailFragment.ARG_AUTH,
-//                        intent.getStringExtra(ItemDetailFragment.ARG_AUTH)
-//                    )
 //                }
 //            }
 //
@@ -98,18 +101,23 @@ class ItemDetailActivity : BaseActivity() {
 //                .commit()
 //        }
 
+
         val editText = findViewById<EditText>(R.id.item_detail)
 
         if (mDocumentTaskGetDocumentDetailsTask == null) {
-            mDocumentTaskGetDocumentDetailsTask = GetDocumentDetails(
+            mDocumentTaskGetDocumentDetailsTask = Logic.GetDocumentDetailsTask(
+                mDocumentTaskGetDocumentDetailsTask,
                 intent.getStringExtra(ItemDetailFragment.ARG_ITEM_ID),
-                intent.getStringExtra(ItemDetailFragment.ARG_AUTH),
+//                intent.getStringExtra(ItemDetailFragment.ARG_AUTH),
+                loadAuthInfo()!!.authToken,
+                documentData,
                 editText
             )
             mDocumentTaskGetDocumentDetailsTask!!.execute(null as Void?)
         }
 
-        this.toolbar_layout?.title = intent.getStringExtra(ItemDetailFragment.ARG_ITEM_TITLE)
+        // TODO добавить передачу параметров
+//        this.toolbar_layout?.title = intent.getStringExtra(ItemDetailFragment.ARG_ITEM_TITLE)
 
 
 //        editText.text = Editable.Factory.getInstance().newEditable(documentData)
@@ -127,7 +135,9 @@ class ItemDetailActivity : BaseActivity() {
                 //
                 // http://developer.android.com/design/patterns/navigation.html#up-vs-back
 
-                navigateUpTo(Intent(this, ItemListActivity::class.java))
+                // TODO(Save file here)
+
+                navigateUpTo(Intent(this, NavigationActivity::class.java))
                 true
             }
             else -> super.onOptionsItemSelected(item)

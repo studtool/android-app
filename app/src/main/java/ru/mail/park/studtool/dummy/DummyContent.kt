@@ -17,6 +17,8 @@ object DummyContent : BaseActivity() {
 
     var DOCUMENTS: Array<DocumentInfo> = emptyArray()
 
+    fun getByDocumentID(documentID: String) {}
+
     var ITEMS: MutableList<DummyItem> = ArrayList()
 
     /**
