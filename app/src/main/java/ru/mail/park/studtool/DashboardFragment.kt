@@ -4,11 +4,11 @@ package ru.mail.park.studtool
 import ru.mail.park.studtool.R
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.text.Editable
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
-import android.widget.TextView
+import android.widget.*
 
 
 /**
@@ -16,25 +16,58 @@ import android.widget.TextView
  */
 class DashboardFragment : Fragment() {
 
-    lateinit var countTv: TextView
-    lateinit var countBtn: Button
+    var mCalendarHashMap: HashMap<String?, String?> = HashMap()
+
+    var message:String = ""
+    var date: String = "8/6/2019"
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View?{
+
+        super.onCreate(savedInstanceState)
         val view = inflater.inflate(R.layout.fragment_dashboard, container, false)
-        countTv = view.findViewById(R.id.count_tv)
-        countTv.text = "0"
-        countBtn = view.findViewById(R.id.count_btn)
-        countBtn.setOnClickListener { increaseCount() }
+
+
+        val calendarView = view.findViewById<CalendarView>(R.id.calendarView)
+        calendarView?.setOnDateChangeListener { _, year, month, dayOfMonth ->
+
+            val editText = view.findViewById<EditText>(R.id.calenderEventsText)
+            // Note that months are indexed from 0. So, 0 means January, 1 means february, 2 means march etc.
+            date = "" + dayOfMonth + "/" + (month + 1) + "/" + year
+            var msg = getEvent(date)
+            editText.text = Editable.Factory.getInstance().newEditable(msg)
+            message = editText.text.toString()
+
+        }
+
+        val calendarButton = view.findViewById<Button>(R.id.calendarEventSaveButton)
+
+        calendarButton.setOnClickListener {
+            var editText = view.findViewById<EditText>(R.id.calenderEventsText)
+            message = editText.text.toString()
+            handleSave(date, message)
+        }
+
         return view
     }
 
-    private fun increaseCount() {
-        val current = Integer.parseInt(countTv.text as String)
-        countTv.text = (current + 1).toString()
-
+    fun handleSave(date: String, message: String) {
+        if (mCalendarHashMap.containsKey(date)){
+            mCalendarHashMap[date] = message
+        } else {
+            mCalendarHashMap.put(date, message)
+        }
     }
 
-}// Required empty public constructor
+    fun getEvent(date: String):String{
+        if (mCalendarHashMap.containsKey(date)){
+            return mCalendarHashMap[date]!!
+        } else {
+            return ""
+        }
+    }
+
+} // Required empty public constructor

@@ -4,7 +4,7 @@
              android:layout_width="match_parent"
              android:layout_height="match_parent"
              xmlns:app="http://schemas.android.com/apk/res-auto"
-             tools:context=".home.HomeFragment">
+             tools:context=".list.ListFragment">
 
     <android.support.v7.widget.RecyclerView
             android:layout_width="match_parent"
@@ -18,6 +18,6 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
             android:layout_margin="@dimen/fab_margin"
-            app:srcCompat="@mipmap/baseline_add_white_48"/>
+            app:srcCompat="@mipmap/baseline_add_white_48" android:onClick="withEditText"/>
 
 </FrameLayout>

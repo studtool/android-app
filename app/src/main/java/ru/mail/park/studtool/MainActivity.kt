@@ -14,12 +14,15 @@ import ru.mail.park.studtool.dummy.DummyContent
 import ru.mail.park.studtool.exception.InternalApiException
 import ru.mail.park.studtool.exception.NotFoundApiException
 import ru.mail.park.studtool.exception.UnauthorizedException
+import ru.mail.park.studtool.logic.Logic
 
 const val EXTRA_MESSAGE = "com.example.myfirstapp.MESSAGE"
 
 class MainActivity : BaseActivity() {
 
-    private var mDocumentTaskGetDocumentsTask: GetDocumentsTask? = null
+    private var mDocumentTaskGetDocumentsTask: Logic.GetDocumentsTask? = null
+    private var mMessage: String = ""
+    private var mStatusOK: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
@@ -29,7 +32,7 @@ class MainActivity : BaseActivity() {
         if (mDocumentTaskGetDocumentsTask != null) {
             return
         }
-        mDocumentTaskGetDocumentsTask = GetDocumentsTask(loadAuthInfo()!!)
+        mDocumentTaskGetDocumentsTask = Logic.GetDocumentsTask(mDocumentTaskGetDocumentsTask, loadAuthInfo()!!, mStatusOK, mMessage)
         mDocumentTaskGetDocumentsTask!!.execute(null as Void?)
 
         val button = findViewById<Button>(R.id.button_exit)
@@ -42,57 +45,27 @@ class MainActivity : BaseActivity() {
             finish()
         }
 
-//        val buttonTest = findViewById<Button>(R.id.button)
-//
-//        buttonTest.setOnClickListener {
-//            val intent = Intent(this, NavigationActivity::class.java)
-//            startActivity(intent)
-//            finish()
-//        }
+        val buttonTest = findViewById<Button>(R.id.button)
 
-    }
-
-    fun openItems(view: View) {
-        val intent = Intent(this, ItemListActivity::class.java)
-        startActivity(intent)
-    }
-
-
-
-    private inner class GetDocumentsTask(private val mAuthInfo: AuthInfo) :
-        AsyncTask<Void, Void, Array<DocumentInfo>>() {
-
-        override fun doInBackground(vararg params: Void): Array<DocumentInfo> {
-            return try {
-                DocumentsApiManager().getDocumentsList("subject", mAuthInfo)
-            } catch (e: UnauthorizedException) {
-                showErrorMessage(getString(R.string.msg_wrong_credentials))
-                emptyArray<DocumentInfo>()
-            } catch (e: InternalApiException) {
-//                showErrorMessage(getString(R.string.msg_internal_server_error))
-                emptyArray<DocumentInfo>()
-            } catch (e: NotFoundApiException) {
-                emptyArray<DocumentInfo>()
-            } catch (e: InterruptedException) {
-                emptyArray<DocumentInfo>()
-            }
+        buttonTest.setOnClickListener {
+            val intent = Intent(this, NavigationActivity::class.java)
+            startActivity(intent)
+            finish()
         }
 
-        override fun onPostExecute(documentsInfo: Array<DocumentInfo>) {
-            mDocumentTaskGetDocumentsTask = null
+        val calendarButton = findViewById<Button>(R.id.calendar_button)
 
-            if (documentsInfo != null) {
-
-//                documentsInfo.copyInto(DOCUMENTS)
-
-                DummyContent.DOCUMENTS = documentsInfo
-//                finish();
-//                startActivity(getIntent());
-
-//                showErrorMessage("Получено документов " + DummyContent.DOCUMENTS.size)
-//                finish() //TODO show next activity
-            }
+        calendarButton.setOnClickListener {
+            val intent = Intent(this, CalendarActivity::class.java)
+            startActivity(intent)
+            finish()
         }
 
     }
+
+//    fun openItems(view: View) {
+//        val intent = Intent(this, ItemListActivity::class.java)
+//        startActivity(intent)
+//    }
+
 }
