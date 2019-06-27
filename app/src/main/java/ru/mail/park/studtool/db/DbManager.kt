@@ -8,7 +8,7 @@ class DocumentDbManager(ctx: Context) :
     SQLiteOpenHelper(ctx, DB_NAME, null, DB_VERSION) {
     override fun onCreate(db: SQLiteDatabase?) {
         db?.execSQL(
-            "CREATE TABLE document (id, name, content)"
+            "CREATE TABLE document (id, name, content);"
         )
     }
 
