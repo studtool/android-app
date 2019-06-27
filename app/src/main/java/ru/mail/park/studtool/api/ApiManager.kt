@@ -1,0 +1,54 @@
+package ru.mail.park.studtool.api
+
+import com.google.gson.Gson
+import com.google.gson.GsonBuilder
+import com.google.gson.JsonSyntaxException
+import okhttp3.MediaType
+import okhttp3.Response
+import ru.mail.park.studtool.auth.AuthInfo
+import ru.mail.park.studtool.exception.InternalApiException
+
+open class ApiManager {
+    companion object {
+        private const val HTTP_PROTO = "http"
+        private const val SERVER_ADDRESS = "94.29.74.65:80"
+
+        private const val REQUEST_PREFIX = "$HTTP_PROTO://$SERVER_ADDRESS/api"
+
+        private const val REQUEST_V0_PREFIX = "$REQUEST_PREFIX/v0"
+
+        private val mSerializer: Gson = GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ").create()
+
+        const val PUBLIC_REQUEST_V0_PREFIX = "$REQUEST_V0_PREFIX/public"
+        const val PROTECTED_REQUEST_V0_PREFIX = "$REQUEST_V0_PREFIX/protected"
+
+        val mTypeJSON: MediaType = MediaType.get("application/json; charset=utf-8")
+        val mTypeByte: MediaType = MediaType.get("application/octet-stream; charset=utf-8")
+
+        fun toJSON(obj: Any): String {
+            return mSerializer.toJson(obj)
+        }
+
+        fun fromJSON(str: String, cls: Class<*>): Any {
+            try {
+                return mSerializer.fromJson(str, cls)
+            } catch (exception: JsonSyntaxException) {
+                throw InternalApiException(exception.message!!)
+            }
+        }
+
+        fun getAuthHeader(authInfo: AuthInfo): Pair<String, String> {
+            return Pair("Authorization", "Bearer ${authInfo.authToken}")
+        }
+
+        inline fun <reified T> parseJSONBody(response: Response): T {
+            val body = response.body()
+            if (response.body() == null) {
+                throw InternalApiException("response body is empty")
+            }
+            return cast(fromJSON(body!!.string(), T::class.java))
+        }
+
+        inline fun <reified T> cast(any: Any?): T = any as T
+    }
+}
